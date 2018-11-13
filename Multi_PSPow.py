@@ -21,15 +21,11 @@ plt.rcParams.update({'font.size': 15})
 
 
 
-path='C:\Users\Kenneth\Desktop\AMTM\AMTM*TOTAL'
+path='C:\Users\Kenneth\Desktop\post-data\AMTM*TOTAL'
 files=glob.glob(path+'.csv')
 files=natsorted(files)
-#zpt=2.0**11
-#dt=60.0
-#zpt=1661.0
-#dt=74.0
+
 t2=np.zeros(np.size(files))
-#xf=np.zeros(np.size(files)-1)
 
 
 
@@ -43,11 +39,7 @@ for i in range(0,np.size(files)):
 
     data2 = pd.read_csv(files[i])
     data1[:,:,i]=data2.values
-#
-#Freq=np.array([161.,118.,86.,59.,43.,30.,21.])
-#Period=np.zeros(7)
-#for k in range(0,7):
-#    Period[k]=round(1./(Freq[k]/(zpt*dt))/60.,2)lkKJ #in minutes
+
 x=np.arange(-len(data)/2,len(data)/2+1,1)
 y=np.arange(-len(data)/2,len(data)/2+1,1)
 x0=np.zeros(len(data)+1)
@@ -57,8 +49,6 @@ for k in range(0,np.size(files)):
     for i in range(0,300):
         for ii in range(0,301):
         
-#            l=int((k-1.)*np.size(files)/6.)
-#            m=int(k*np.size(files)/6.)-1
             data[i,ii]= data1[i,ii,k]
     
     plt.figure(figsize=(10,8))
@@ -128,16 +118,9 @@ for k in range(0,np.size(files)):
     plt.text(78,140,'Max_Val='+np.str(int(psmax))+'[m/s]',color='white',fontsize=12)
 
     plt.show()
-    plt.savefig('C:/Users/Kenneth/Desktop/AMTM/AMTM_3hr_#'+np.str(k)+'.jpeg')
+    plt.savefig('C:/Users/Kenneth/Desktop/post-data/AMTM_3hr_#'+np.str(k)+'.jpeg')
 #    
 
-#for i in range(0,300):
-#    for ii in range(0,301): 
-#        data3[i,ii]=np.log10(np.sum((10**data1[i,ii,:])/float(np.size(files))))
-#
-#   
-   
-   
    
 
 for i in range(0,300):
@@ -178,7 +161,7 @@ circle23 = plt.Circle((0, 0), 70,linestyle=':', color='k', fill=False)
 circle33 = plt.Circle((0, 0), 80,linestyle=':', color='k', fill=False)
 circle43 = plt.Circle((0, 0), 90,linestyle=':', color='k', fill=False)
 
-plt.pcolormesh(x,y,data3,cmap='jet',vmin=-6.5,vmax=-14)
+plt.pcolormesh(x,y,data3,cmap='jet',vmin=-6.5,vmax=-12)
 plt.plot()
 
 plt.title('AMTM BandOH 24hr Avgerage')

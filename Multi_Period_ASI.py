@@ -23,7 +23,7 @@ perpow=np.zeros((np.size(perbin),8))
 permean=np.zeros(np.size(perbin))
 
 for k in range(0,8):
-    FILE='C:\Users\Kenneth\Desktop\post-data\ASI'
+    FILE='C:\Users\Kenneth\Desktop\AMTM-ASI-3hr-18-19\ASI'
     
     path=FILE+str(k)+'_WN_'
     files=glob.glob(path+'*.csv')
@@ -39,7 +39,6 @@ for k in range(0,8):
     x1=np.zeros(np.size(files))
     y1=np.zeros(np.size(files))
     
-
     
     for i in range(0,np.size(files)-1):
     
@@ -54,8 +53,7 @@ for k in range(0,8):
     
     
     plt.loglog(perbin,perpow[:,k],linewidth=0.5)  
-    plt.xlim(60,1)
-    plt.title('Period Analysis ASI')
+    plt.title('Period Analysis ASI (Jun18-19)')
     plt.xlabel('Period (min)')
     plt.ylabel('Power (1/min)')
 #    plt.loglog(perbin,(perbin)**(-1)*10**-0.5,label='5/3-power')
@@ -70,7 +68,7 @@ plt.loglog(perbin,permean,label='ASI-mean',linewidth=3)
 
 
 
-path='C:\Users\Kenneth\Desktop\Analysis24hr\ASI_WN_'
+path='C:\Users\Kenneth\Desktop\post-data\ASI_18-19_WN_'
 files=glob.glob(path+'*.csv')
 files=natsorted(files)
 
@@ -98,7 +96,6 @@ for j in range (0,30,1):
     perbin[j]=1.0/(1.0/(8*60.0)-(j*10.0)/(dt*zpt))/60.0
 
     
-#
 plt.loglog(perbin,perpow,label='ASI-24hr',linewidth=3)
 plt.scatter(perbin,perpow) 
 plt.loglog(perbin,(perbin)**(1)*10**(-17.0/5.0),linewidth=2,linestyle='--',label='1-slope')

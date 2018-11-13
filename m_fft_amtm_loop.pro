@@ -49,16 +49,16 @@ PRO M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
   TIC
 
 ;  FILE='/home0/ken/post-data/AMTM'
-  restore,'/home0/ken/post-data/AMTM_17-18.sav'
+  restore,'/home0/ken/pre-data/AMTM_BandOH_18-19.sav'
   ;FILE='/home0/ken/post-data/ASI'
 
   datasize=size(data4)
   datatime=datasize(3)
-  ddt=floor(datatime/50.0)
+  ddt=floor(datatime/145.0)
   FOR q=0,ddt-1 DO BEGIN
 
     FILE='/home0/ken/post-data/AMTM'+string(q)
-    img=data4(*,*,q*50:(q+1)*50)
+    img=data4(*,*,q*145:(q+1)*145)
 
 
 
@@ -88,7 +88,7 @@ PRO M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
 
   if not (keyword_set(zpx)) then zpx=512.  ;Size of zero padding in x axis
   if not (keyword_set(zpy)) then zpy=zpx    ;Size of zero padding in y axis
-  if not (keyword_set(zpt)) then zpt=1661.   ;Zero padding size in time dimension
+  if not (keyword_set(zpt)) then zpt=2^11.   ;Zero padding size in time dimension
 
 
   ;-----------------------Set sampling period-----------------------------------------------;
@@ -225,6 +225,14 @@ PRO M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
   xgo1=intarr(xy1,xy1,tt1)       ;Distance from the center in k
   ygo1=intarr(xy1,xy1,tt1)       ;Distance from the center in l
 
+
+  for i=0,tt1-1 do begin
+
+    Pband=alog10(fft_result2(*,*,i)/float(zpt*tres)+1.0e-22)
+    NAME=FILE+'_WN_'+string(i)+'.csv'
+    FILES=NAME.compress()
+    WRITE_CSV,FILES,Pband
+  endfor
 
 
   if (xy1 mod 2) eq 1 then begin
@@ -443,14 +451,14 @@ PRO M_FFT_AMTM_LOOP, img,dx=dx,dy=dy,dt=dt,$
   ;================================================================================
 
   TOC
-  ; for i=0,tt1_int-1 do begin
-  ;
-  ;   Pband=alog10(interpol_result(*,*,i)/float(zpt*tres)+1.0e-22)
-  ;   NAME=FILE+'_'+string(i)+'.csv'
-  ;   FILES=NAME.compress()
-  ;   WRITE_CSV,FILES,Pband
-  ; endfor
-NAME=FILE+'.csv'
+;   for i=0,tt1_int-1 do begin
+;  
+;     Pband=alog10(interpol_result(*,*,i)/float(zpt*tres)+1.0e-22)
+;     NAME=FILE+'_'+string(i)+'.csv'
+;     FILES=NAME.compress()
+;     WRITE_CSV,FILES,Pband
+;   endfor
+NAME=FILE+'_TOTAL.csv'
 NAME=NAME.compress()
   WRITE_CSV,NAME,FINAL_DATA
   

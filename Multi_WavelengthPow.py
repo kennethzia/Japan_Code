@@ -19,7 +19,7 @@ wavepow=np.zeros((np.size(wavebin),8))
 wavepow2=np.zeros((np.size(wavebin),8))
 wavemean=np.zeros(np.size(wavebin))
 for k in range(0,8):
-    FILE='C:\Users\Kenneth\Desktop\AMTM\AMTM'+np.str(k)
+    FILE='C:\Users\Kenneth\Desktop\AMTM-ASI-3hr-18-19\AMTM'+np.str(k)
     
     path=FILE+'_WN_'
     files=glob.glob(path+'*.csv')
@@ -54,7 +54,7 @@ for k in range(0,8):
  
     plt.loglog(wavebin,wavepow[:,k],linewidth=0.5)  
 
-    plt.title('Wavelength Analysis AMTM-BandOH')
+    plt.title('Wavelength Analysis AMTM-BandOH (Jun18-19)')
     plt.xlabel('Wavelegnth (km)')
     plt.ylabel('Power (1/km)')
 
@@ -64,9 +64,8 @@ for i in range (0,np.size(wavebin)):
 plt.loglog(wavebin,wavemean,label='AMTM-BandOH-mean',linewidth=3)
 
 wavepow24=np.zeros(np.size(wavebin))
-FILE='C:\Users\Kenneth\Desktop\Analysis24hr\AMTM_BandOH'
+FILE='C:\Users\Kenneth\Desktop\AMTM-ASI_24hr-18-19\AMTM_BandOH_18-19_WN_'
 
-path=FILE+'_WN_'
 files=glob.glob(path+'*.csv')
 files=natsorted(files)
 

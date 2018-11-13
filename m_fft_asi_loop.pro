@@ -48,409 +48,419 @@ PRO M_FFT_ASI_LOOP, img,dx=dx,dy=dy,dt=dt,$
 
   TIC
 
-restore,'/home0/ken/pre-data/ASI_17-18.sav'
+  ;  FILE='/home0/ken/post-data/AMTM'
+  restore,'/home0/ken/pre-data/ASI_18-19.sav'
   ;FILE='/home0/ken/post-data/ASI'
- 
- datasize=size(data4)
- datatime=datasize(3)
- ddt=floor(datatime/60.0)
- FOR q=0,ddt-1 DO BEGIN
-  
-  FILE='/home0/ken/post-data/ASI'+string(q)
-  img=data4(*,*,q*60:(q+1)*60)
 
-  ;----------------------Set Image Resolution----------------------------------------------;
-  if not (keyword_set(dx)) then dx=1000. ;Image resolution of x axis (m)
-  if not (keyword_set(dy)) then dy=dx    ;Image resolution of y axis (m)
-  if not (keyword_set(dt)) then dt=60.   ;Image time resolution (s);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  dx=FLOAT(dx)
-  dy=FLOAT(dy)
-  ;-----------------------Image Size--------------------------------------------------------;
-  imgsize=size(img) ;Get image size
-  nx=imgsize(1)     ;Image size in x axis
-  ny=nx             ;Image size in y axis
-  nt=imgsize(3)     ;Image size in time
-  icen=(nt-1)/2
+  datasize=size(data4)
+  datatime=datasize(3)
+  ddt=floor(datatime/154.0)
+  FOR q=0,ddt-1 DO BEGIN
 
-  ;-----------------------Set Wave Parameters Input-----------------------------------------;
-
-  if not (keyword_set(LH_min)) then LH_min= 5000.0         ;Horizontal wavelength minimum (m)
-  if not (keyword_set(LH_max)) then LH_max= 100000.0       ;Horizontal wavelength maximum (m)
-  if not (keyword_set(T_min)) then T_min= 480.0            ;Wave period minimum (s)
-  if not (keyword_set(T_max)) then T_max= 3600.0       ;Wave period maximum (s)
-  if not (keyword_set(Vp_min)) then Vp_min= 0.0            ;Wave speed minimum (m/s)
-  if not (keyword_set(Vp_max)) then Vp_max= 150.           ;Wave speed maximum (m/s)
-
-  ;-------------------------Set zero padding parameters------------------------------------;
-
-  if not (keyword_set(zpx)) then zpx=512.  ;Size of zero padding in x axis
-  if not (keyword_set(zpy)) then zpy=zpx    ;Size of zero padding in y axis
-  if not (keyword_set(zpt)) then zpt=2^10.   ;Zero padding size in time dimension
+    FILE='/home0/ken/post-data/ASI'+string(q)
+    img=data4(*,*,q*154:(q+1)*154)
 
 
-  ;-----------------------Set sampling period-----------------------------------------------;
 
-  tres=FLOAT(dt)
-  tr_min=t_min   ;Period minimum (s)
-  tr_max=t_max   ;Period maximum (s)
-  tr1=round([zpt/2.-zpt/fix(tr_min/tres),zpt/2.-zpt/fix(tr_max/tres)]) ;Period range
+    ;----------------------Set Image Resolution----------------------------------------------;
+    if not (keyword_set(dx)) then dx=1000. ;Image resolution of x axis (m)
+    if not (keyword_set(dy)) then dy=dx    ;Image resolution of y axis (m)
+    if not (keyword_set(dt)) then dt=70.   ;Image time resolution (s);;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    dx=FLOAT(dx)
+    dy=FLOAT(dy)
+    ;-----------------------Image Size--------------------------------------------------------;
+    imgsize=size(img) ;Get image size
+    nx=imgsize(1)     ;Image size in x axis
+    ny=nx             ;Image size in y axis
+    nt=imgsize(3)     ;Image size in time
+    icen=(nt-1)/2
+
+    ;-----------------------Set Wave Parameters Input-----------------------------------------;
+
+    if not (keyword_set(LH_min)) then LH_min= 5000.0         ;Horizontal wavelength minimum (m)
+    if not (keyword_set(LH_max)) then LH_max= 100000.0       ;Horizontal wavelength maximum (m)
+    if not (keyword_set(T_min)) then T_min= 480.0            ;Wave period minimum (s)
+    if not (keyword_set(T_max)) then T_max= 3600.0       ;Wave period maximum (s)
+    if not (keyword_set(Vp_min)) then Vp_min= 0.0            ;Wave speed minimum (m/s)
+    if not (keyword_set(Vp_max)) then Vp_max= 150.           ;Wave speed maximum (m/s)
+
+    ;-------------------------Set zero padding parameters------------------------------------;
+
+    if not (keyword_set(zpx)) then zpx=512.  ;Size of zero padding in x axis
+    if not (keyword_set(zpy)) then zpy=zpx    ;Size of zero padding in y axis
+    if not (keyword_set(zpt)) then zpt=2^11.   ;Zero padding size in time dimension
 
 
-  ;-------------------Check if the horizontal wavelength inputs are correct------------------;
+    ;-----------------------Set sampling period-----------------------------------------------;
 
-  if LH_max le LH_min then begin
-    print, 'WARNING: LH_max should be larger than LH_min!'
-    stop
-  endif else begin
-    if LH_min le 1000 then begin
-      print, 'WARNING: Horizontal wavelength value should be in meter!'
+    tres=FLOAT(dt)
+    tr_min=t_min   ;Period minimum (s)
+    tr_max=t_max   ;Period maximum (s)
+    tr1=round([zpt/2.-zpt/fix(tr_min/tres),zpt/2.-zpt/fix(tr_max/tres)]) ;Period range
+
+
+    ;-------------------Check if the horizontal wavelength inputs are correct------------------;
+
+    if LH_max le LH_min then begin
+      print, 'WARNING: LH_max should be larger than LH_min!'
       stop
     endif else begin
-      if LH_min le (2.*dx) then begin
-        print, 'WARNING: Horizontal wavelength minimum should be larger than 2*dx!'
+      if LH_min le 1000 then begin
+        print, 'WARNING: Horizontal wavelength value should be in meter!'
         stop
       endif else begin
-        if LH_max gt (2.*zpx*dx) then begin
-          print, 'WARNING: Horizontal wavelength maximum should be less than 2*zpx*dx!'
+        if LH_min le (2.*dx) then begin
+          print, 'WARNING: Horizontal wavelength minimum should be larger than 2*dx!'
+          stop
+        endif else begin
+          if LH_max gt (2.*zpx*dx) then begin
+            print, 'WARNING: Horizontal wavelength maximum should be less than 2*zpx*dx!'
+            stop
+          endif
+        endelse
+      endelse
+    endelse
+
+    ;------------------Check if the wave period inputs are correct--------------------------------;
+
+    if T_max le T_min then begin
+      print, 'WARNING: T_max should be larger than T_min!'
+      stop
+    endif else begin
+      if T_min lt (2.*dt) then begin
+        print, 'WARNING: Wave period minimum should be larger than 2*dt!'
+        stop
+      endif else begin
+        ;endelse
+        if T_max gt (2.*zpt*dt) then begin
+          print, 'WARNING: Wave period maximum should be less than 2.*zpt*dt!'
           stop
         endif
       endelse
     endelse
-  endelse
 
-  ;------------------Check if the wave period inputs are correct--------------------------------;
+    ;---------------------Check if the zero padding parameter is correct--------------------------;
 
-  if T_max le T_min then begin
-    print, 'WARNING: T_max should be larger than T_min!'
-    stop
-  endif else begin
-    if T_min lt (2.*dt) then begin
-      print, 'WARNING: Wave period minimum should be larger than 2*dt!'
+    if zpx lt nx or zpx gt 2048 then begin
+      print, 'Error: zpx should be in the range between nx and 2048'
       stop
-    endif else begin
-      ;endelse
-      if T_max gt (2.*zpt*dt) then begin
-        print, 'WARNING: Wave period maximum should be less than 2.*zpt*dt!'
-        stop
-      endif
+    endif
+    if zpy lt ny or zpy gt 2048 then begin
+      print, 'Error: zpy should be in the range between ny and 2048'
+      stop
+    endif
+    if zpt lt nt or zpt gt 2048 then begin
+      print, 'Error: zpt should be in the range between nt and 2048'
+      stop
+    endif
+
+    ;---------------------Pre_whitening filter (Coble et al.1998)-----------------------------------------;
+
+    fker=fltarr(11,11) ;Kernel array
+    fker(0,5)=-0.0002
+    fker(1,*)=[0.0,0.0,-0.0001,-0.0002,-0.0003,0.0008,-0.0003,-0.0002,-0.0001,0.0,0.0]
+    fker(2,*)=[0.0,-0.0001,-0.0003,-0.0007,-0.0016,-0.0071,-0.0016,-0.0007,-0.0003,-0.0001,0.0]
+    fker(3,*)=[0.0,-0.0002,-0.0007,-0.0020,-0.0032,0.0146,-0.0032,-0.0020,-0.0007,-0.0002,0.0]
+    fker(4,*)=[0.0,-0.0003,-0.0016,-0.0032,-0.0291,-0.1721,-0.0291,-0.0032,-0.0016,-0.0003,0.0]
+    fker(5,*)=[-0.0002,0.0008,-0.0071,0.0146,-0.1721,1.0219,-0.1721,0.0146,-0.0071,0.0008,-0.0002]
+    fker(6,*)=fker(4,*)
+    fker(7,*)=fker(3,*)
+    fker(8,*)=fker(2,*)
+    fker(9,*)=fker(1,*)
+    fker(10,*)=fker(0,*)
+
+    ;---------------------Pre_whitening filter response-------------------------------------------------;
+
+    kspec1=fltarr(zpx - 1, zpy-1)
+    kspec1(zpx * 0.5 - 1,zpx * 0.5 - 1)=1.0
+    kspec2=convol(kspec1,fker)
+    kspec3=2.0*((abs(fft(kspec2,/center)))^2)
+    fres=kspec3/max(kspec3)
+
+
+    ;---------------Prewhitening process----------------------------------------------------------------;
+
+    if (nt-1) eq (floor((nt-1)/2.0)*2) then begin ;even case
+      ran1=icen-(nt-1)/2 & ran2=icen+(nt-1)/2 & ran3=zpt/2-(nt-1)/2 & ran4=zpt/2+(nt-1)/2
+    endif else begin ;odd case
+      ran1=icen-(nt-2)/2-1 & ran2=icen+(nt-2)/2 & ran3=zpt/2-(nt-2)/2-1 & ran4=zpt/2+(nt-2)/2
     endelse
-  endelse
 
-  ;---------------------Check if the zero padding parameter is correct--------------------------;
+    img2=fltarr(nx,ny,zpt)
+    prewhite1=fltarr(nx,ny)
+    for pw1=ran3(0),ran4(0) do begin
+      prewhite1(*,*)=img(*,*,pw1-ran3)
+      img2(*,*,pw1)=convol(prewhite1,fker) ;Prewhitening result
 
-  if zpx lt nx or zpx gt 2048 then begin
-    print, 'Error: zpx should be in the range between nx and 2048'
-    stop
-  endif
-  if zpy lt ny or zpy gt 2048 then begin
-    print, 'Error: zpy should be in the range between ny and 2048'
-    stop
-  endif
-  if zpt lt nt or zpt gt 2048 then begin
-    print, 'Error: zpt should be in the range between nt and 2048'
-    stop
-  endif
-
-  ;---------------------Pre_whitening filter (Coble et al.1998)-----------------------------------------;
-
-  fker=fltarr(11,11) ;Kernel array
-  fker(0,5)=-0.0002
-  fker(1,*)=[0.0,0.0,-0.0001,-0.0002,-0.0003,0.0008,-0.0003,-0.0002,-0.0001,0.0,0.0]
-  fker(2,*)=[0.0,-0.0001,-0.0003,-0.0007,-0.0016,-0.0071,-0.0016,-0.0007,-0.0003,-0.0001,0.0]
-  fker(3,*)=[0.0,-0.0002,-0.0007,-0.0020,-0.0032,0.0146,-0.0032,-0.0020,-0.0007,-0.0002,0.0]
-  fker(4,*)=[0.0,-0.0003,-0.0016,-0.0032,-0.0291,-0.1721,-0.0291,-0.0032,-0.0016,-0.0003,0.0]
-  fker(5,*)=[-0.0002,0.0008,-0.0071,0.0146,-0.1721,1.0219,-0.1721,0.0146,-0.0071,0.0008,-0.0002]
-  fker(6,*)=fker(4,*)
-  fker(7,*)=fker(3,*)
-  fker(8,*)=fker(2,*)
-  fker(9,*)=fker(1,*)
-  fker(10,*)=fker(0,*)
-
-  ;---------------------Pre_whitening filter response-------------------------------------------------;
-
-  kspec1=fltarr(zpx - 1, zpy-1)
-  kspec1(zpx * 0.5 - 1,zpx * 0.5 - 1)=1.0
-  kspec2=convol(kspec1,fker)
-  kspec3=2.0*((abs(fft(kspec2,/center)))^2)
-  fres=kspec3/max(kspec3)
-
-
-  ;---------------Prewhitening process----------------------------------------------------------------;
-
-  if (nt-1) eq (floor((nt-1)/2.0)*2) then begin ;even case
-    ran1=icen-(nt-1)/2 & ran2=icen+(nt-1)/2 & ran3=zpt/2-(nt-1)/2 & ran4=zpt/2+(nt-1)/2
-  endif else begin ;odd case
-    ran1=icen-(nt-2)/2-1 & ran2=icen+(nt-2)/2 & ran3=zpt/2-(nt-2)/2-1 & ran4=zpt/2+(nt-2)/2
-  endelse
-
-  img2=fltarr(nx,ny,zpt)
-  prewhite1=fltarr(nx,ny)
-  for pw1=ran3(0),ran4(0) do begin
-    prewhite1(*,*)=img(*,*,pw1-ran3)
-    img2(*,*,pw1)=convol(prewhite1,fker) ;Prewhitening result
-
-  endfor
-  print, 'pre-whitening done'
-  ;---------------------Zero padding------------------------------------------------------------------;
-
-  rr1=zpx/2-1-nx/2+1 & rr2=zpx/2-1+nx/2   ;rr1=position to put the real image
-  fa1=fltarr(zpx,zpy,zpt)
-  fft_result1=fltarr(zpx,zpy,zpt) ;Array to hold initial FFT_result
-
-  ;--------------------Apply Hanning window (not applied in time dimension)---------------------------;
-
-  for le1=ran3(0),ran4(0) do fa1(rr1:rr2,rr1:rr2,le1)=img2(*,*,le1)*HANNING(nx,ny)
-  print, 'hanning window done'
-  ;---------------------3D FFT------------------------------------------------------------------------;
-
-  fft_result1(*,*,*)=2.0*((abs(FFT(fa1(*,*,*),/center)))^2) ;Initial FFT result for whole spectrum (k,l,w)
-  fvalue=((float(zpx)^2)*float(zpt))/((float(nx)^2)*float((nt))) ;Correction factor
-
-  print, '3D FFT done'
-  ;--------------------Recoloring----------------------------------------------------------------------;
-
-  for le2=0,zpt-1 do fft_result1(1:zpx-1,1:zpy-1,le2)=fft_result1(1:zpx-1,1:zpy-1,le2)*(((float(zpx*dx)*float(zpy*dy))*float(zpt))*fvalue(0))*float(tres)/fres(*,*)
-  sr1=[zpx/2-fix(float(zpx*dx)/float(LH_min)),zpx/2+fix(float(zpx*dx)/float(LH_min))]
-  fft_result2=fft_result1(sr1(0):sr1(1),sr1(0):sr1(1),tr1(0):tr1(1)) ;FFT result limited between LH_min and LH_max
-
-  xy2=Vp_max * 2 + 1
-  xy1=sr1(1)-sr1(0)+1            ;Range of k and l
-  tt1=tr1(1)-tr1(0)+1            ;Range of frequency
-  v1a=intarr(xy1,xy1,tt1)
-  angle1a=fltarr(xy1,xy1,tt1)    ;Angle omega/k, omega/l
-  jacobian1=fltarr(xy1,xy1,tt1)  ;Jacobian
-  xgo1=intarr(xy1,xy1,tt1)       ;Distance from the center in k
-  ygo1=intarr(xy1,xy1,tt1)       ;Distance from the center in l
-
-
-
-  if (xy1 mod 2) eq 1 then begin
-    ax1=fltarr(xy1)
-    ax1(0:xy1/2-1)=-reverse(findgen((xy1-1)/2)+1)
-    replacement_value=1.0e-38
-    ax1((xy1-1)/2)=ax1((xy1-1)/2)+replacement_value
-    ax1(xy1/2+1:xy1-1)=-reverse(ax1(0:xy1/2-1))
-  endif else begin
-    ax1=fltarr(xy1)
-    ax1(0:xy1/2)=-reverse(findgen(xy1/2+1)+1)
-    ax1(xy1/2+2:xy1-1)=findgen(xy1/2-2)+1
-  endelse
-
-
-  r=fltarr(xy1,xy1) ;Radius of the circle
-
-
-  for i1=0,xy1-1 do begin
-    for i2=0,xy1-1 do begin
-      r(i1,i2)=sqrt(ax1(i1)^2+ax1(i2)^2)      ;;;;;;;;;;;;Causes "Floating Underflow" Error when 9E-39 is squared and becomes 0.0
     endfor
-  endfor
+    print, 'pre-whitening done'
+    ;---------------------Zero padding------------------------------------------------------------------;
 
-  r((xy1-1)/2,(xy1-1)/2)=r((xy1-1)/2,(xy1-1)/2)+0.3826 ;Replace the center with GDM value to avoid division by 0
+    rr1=zpx/2-1-nx/2+1 & rr2=zpx/2-1+nx/2   ;rr1=position to put the real image
+    fa1=fltarr(zpx,zpy,zpt)
+    fft_result1=fltarr(zpx,zpy,zpt) ;Array to hold initial FFT_result
 
-  v1a_1=fltarr(xy1,xy1)
-  jacobian1_1=fltarr(xy1,xy1)
-  angle1a_1=fltarr(xy1,xy1)
+    ;--------------------Apply Hanning window (not applied in time dimension)---------------------------;
 
-  for i1=0,xy1-1 do begin
-    for i2=0,xy1-1 do begin
-      ;r(i1,i2)=sqrt(ax1(i1)^2+ax1(i2)^2)
-      v1a_1(i1,i2)=round(float(zpx*dx)/r(i1,i2)  )
-      jacobian1_1(i1,i2)=(r(i1,i2)^4/(float(zpx*dx))^4)
-      angle1a_1(i1,i2)=atan(ax1(i2),ax1(i1))
+    for le1=ran3(0),ran4(0) do fa1(rr1:rr2,rr1:rr2,le1)=img2(*,*,le1)*HANNING(nx,ny)
+    print, 'hanning window done'
+    ;---------------------3D FFT------------------------------------------------------------------------;
+
+    fft_result1(*,*,*)=2.0*((abs(FFT(fa1(*,*,*),/center)))^2) ;Initial FFT result for whole spectrum (k,l,w)
+    fvalue=((float(zpx)^2)*float(zpt))/((float(nx)^2)*float((nt))) ;Correction factor
+
+    print, '3D FFT done'
+    ;--------------------Recoloring----------------------------------------------------------------------;
+
+    for le2=0,zpt-1 do fft_result1(1:zpx-1,1:zpy-1,le2)=fft_result1(1:zpx-1,1:zpy-1,le2)*(((float(zpx*dx)*float(zpy*dy))*float(zpt))*fvalue(0))*float(tres)/fres(*,*)
+    sr1=[zpx/2-fix(float(zpx*dx)/float(LH_min)),zpx/2+fix(float(zpx*dx)/float(LH_min))]
+    fft_result2=fft_result1(sr1(0):sr1(1),sr1(0):sr1(1),tr1(0):tr1(1)) ;FFT result limited between LH_min and LH_max
+
+    xy2=Vp_max * 2 + 1
+    xy1=sr1(1)-sr1(0)+1            ;Range of k and l
+    tt1=tr1(1)-tr1(0)+1            ;Range of frequency
+    v1a=intarr(xy1,xy1,tt1)
+    angle1a=fltarr(xy1,xy1,tt1)    ;Angle omega/k, omega/l
+    jacobian1=fltarr(xy1,xy1,tt1)  ;Jacobian
+    xgo1=intarr(xy1,xy1,tt1)       ;Distance from the center in k
+    ygo1=intarr(xy1,xy1,tt1)       ;Distance from the center in l
+
+
+    for i=0,tt1-1 do begin
+
+      Pband=alog10(fft_result2(*,*,i)/float(zpt*tres)+1.0e-22)
+      NAME=FILE+'_WN_'+string(i)+'.csv'
+      FILES=NAME.compress()
+      WRITE_CSV,FILES,Pband
     endfor
-  endfor
-
-  for i3=0,tt1-1  do begin
-    v1a(*,*,i3)=v1a_1(*,*)/(float(zpt*tres))*float(zpt/2-tr1(0)-i3)
-    jacobian1(*,*,i3)=jacobian1_1(*,*)*(((float(zpt*tres))^2)/(float(zpt/2-tr1(0)-i3))^2)
-    angle1a(*,*,i3)=angle1a_1(*,*)
-  endfor
 
 
-  xgo1(*,*,*)=round(float(xy2-1.0)/2.0+v1a(*,*,*)*cos(angle1a(*,*,*)))
-  ygo1(*,*,*)=round(float(xy2-1.0)/2.0+v1a(*,*,*)*sin(angle1a(*,*,*)))
-
-  print,'recoloring done'
-  ;---------------Masking---------------------------------------------------------------------------------;
-
-  mask1a=fltarr(xy1,xy1)
-  mask1b=fltarr(xy1,xy1)
-  rr2=dblarr(xy1,xy1)
-  for lc1=0,xy1-1 do begin
-    for lc2=0,xy1-1 do begin
-      rr2(lc1,lc2)=sqrt((float(lc1)-float(xy1-1.0)/2.0)^2+(float(lc2)-float(xy1-1.0)/2.0)^2)
-    endfor
-  endfor
+    if (xy1 mod 2) eq 1 then begin
+      ax1=fltarr(xy1)
+      ax1(0:xy1/2-1)=-reverse(findgen((xy1-1)/2)+1)
+      replacement_value=1.0e-38
+      ax1((xy1-1)/2)=ax1((xy1-1)/2)+replacement_value
+      ax1(xy1/2+1:xy1-1)=-reverse(ax1(0:xy1/2-1))
+    endif else begin
+      ax1=fltarr(xy1)
+      ax1(0:xy1/2)=-reverse(findgen(xy1/2+1)+1)
+      ax1(xy1/2+2:xy1-1)=findgen(xy1/2-2)+1
+    endelse
 
 
-  cir2=where((rr2 lt float(zpx*dx)/LH_max) or (rr2 gt float(zpx*dx)/LH_min))
-  for lc3=0,tt1-1 do begin
-    mask1a(*,*)=xgo1(*,*,lc3)
-    mask1b(*,*)=ygo1(*,*,lc3)
-    mask1a(cir2)=999
-    mask1b(cir2)=999
-    xgo1(*,*,lc3)=mask1a(*,*)
-    ygo1(*,*,lc3)=mask1b(*,*)
-  endfor
+    r=fltarr(xy1,xy1) ;Radius of the circle
 
-  v2=dblarr(xy2,xy2,tt1)
-  v3=dblarr(xy2,xy2,tt1)
-  v4=dblarr(xy2,xy2,tt1)
 
-  ;------------------------Conversion to phase speed domain----------------------------------------------------------------------------------;
-
-  for ca4=0,tt1-1 do begin
-    for ca1=0,xy1-1 do begin
-      for ca2=0,xy1-1 do begin
-        if (v1a(ca1,ca2,ca4) gt Vp_min) and (v1a(ca1,ca2,ca4) le Vp_max) and ((v1a(ca1,ca2,ca4) ne 0)) and (xgo1(ca1,ca2,ca4) ne 999) then begin
-          v2(xgo1(ca1,ca2,ca4),ygo1(ca1,ca2,ca4),ca4) +=fft_result2(ca1,ca2,ca4)*jacobian1(ca1,ca2,ca4)
-          v3(xgo1(ca1,ca2,ca4),ygo1(ca1,ca2,ca4),ca4) +=1.0
-        endif
+    for i1=0,xy1-1 do begin
+      for i2=0,xy1-1 do begin
+        r(i1,i2)=sqrt(ax1(i1)^2+ax1(i2)^2)
       endfor
     endfor
-  endfor
 
-  print, 'conversion to phase speed done'
-  ;------------Make interpolation table-----------------------------------------------------------------------------;
+    r((xy1-1)/2,(xy1-1)/2)=r((xy1-1)/2,(xy1-1)/2)+0.3826 ;Replace the center with GDM value to avoid division by 0
 
-  sz1=xy2
-  sz2=sz1*2-1
-  sz3=(sz1-1)/2
-  phsp_range=fltarr(2,tt1)  ;Phase speed range
-  interpolate_table=intarr(sz1,sz1,tt1)
-  interpol_result=fltarr(sz1,sz1,tt1)
+    v1a_1=fltarr(xy1,xy1)
+    jacobian1_1=fltarr(xy1,xy1)
+    angle1a_1=fltarr(xy1,xy1)
 
-  for ts1=0,tt1-1 do begin
-    phsp_range(0,ts1)=round((LH_min/(zpt*tres))*((zpt/2-tr1(0)-ts1)))
-    phsp_range(1,ts1)=round((LH_max/(zpt*tres))*(zpt/2-tr1(0)-ts1))
-    array2=dblarr(sz2,sz2)
-    sarray1=intarr(sz2,sz2)
-    ax3=fltarr(sz2)
-    if (sz2 mod 2) eq 1 then begin
-      ax3(0:sz2/2-1)=-reverse(findgen((sz2-1)/2)+1)
-      ax3(sz2/2+1:sz2-1)=-reverse(ax3(0:sz2/2-1))
-    endif else begin
-      ax3(0:sz2/2)=-reverse(findgen(sz2/2+1)+1)
-      ax3(sz2/2+2:sz2-1)=findgen(sz2/2-2)+1
-    endelse
-    array2((sz2-1)/2-sz3:(sz2-1)/2+sz3,(sz2-1)/2-sz3:(sz2-1)/2+sz3)=v3(*,*,ts1)
-
-    for is1=(sz2-1)/2-sz3,(sz2-1)/2+sz3 do begin
-      for is2=(sz2-1)/2-sz3,(sz2-1)/2+sz3 do begin
-        spr1=sqrt(ax3(is1)^2+ax3(is2)^2)
-        if (spr1 ge phsp_range(0,ts1)) and (spr1 le phsp_range(1,ts1)) and (spr1 gt Vp_min) and (spr1 le Vp_max) then begin
-          is3=-1
-          repeat begin
-            is3=is3+1
-            sarray1(is1,is2)=is3
-            key1=0 & key2=0
-            key1=keyword_set(where(array2(is1-is3:is1+is3,is2-is3:is2+is3) ne 0.0 ,/null))
-            key2=keyword_set(array2(is1,is2) ne 0.0)
-          endrep until (key1 eq 1) or (key2 eq 1)
-        endif else begin
-          sarray1(is1,is2)=999
-        endelse
+    for i1=0,xy1-1 do begin
+      for i2=0,xy1-1 do begin
+        ;r(i1,i2)=sqrt(ax1(i1)^2+ax1(i2)^2)
+        v1a_1(i1,i2)=round(float(zpx*dx)/r(i1,i2)  )
+        jacobian1_1(i1,i2)=(r(i1,i2)^4/(float(zpx*dx))^4)
+        angle1a_1(i1,i2)=atan(ax1(i2),ax1(i1))
       endfor
     endfor
-    interpolate_table(*,*,ts1)=sarray1((sz2-1)/2-sz3:(sz2-1)/2+sz3,(sz2-1)/2-sz3:(sz2-1)/2+sz3)
-  endfor
-  interpol_table=interpolate_table
 
-  ;------Get the convolution result-----------------------------------------------------------------;
+    for i3=0,tt1-1  do begin
+      v1a(*,*,i3)=v1a_1(*,*)/(float(zpt*tres))*float(zpt/2-tr1(0)-i3)
+      jacobian1(*,*,i3)=jacobian1_1(*,*)*(((float(zpt*tres))^2)/(float(zpt/2-tr1(0)-i3))^2)
+      angle1a(*,*,i3)=angle1a_1(*,*)
+    endfor
 
-  v3(where(v3 eq 0.0))=1.0
-  v4(*,*,*)=v2(*,*,*)/v3(*,*,*)
-  convol_result=v4  ;Phase speed array before interpolation
 
-  array1_int=convol_result
-  fsize_int=size(array1_int) & sz1_int=fsize_int(1) & tt1_int=fsize_int(3)
-  sr1_int=[zpx/2-fix(float(zpx*dx)/float(LH_min)),zpy/2+fix(float(zpy*dy)/float(LH_min))]
+    xgo1(*,*,*)=round(float(xy2-1.0)/2.0+v1a(*,*,*)*cos(angle1a(*,*,*)))
+    ygo1(*,*,*)=round(float(xy2-1.0)/2.0+v1a(*,*,*)*sin(angle1a(*,*,*)))
 
-  print, 'convolution done'
+    print,'recoloring done'
+    ;---------------Masking---------------------------------------------------------------------------------;
 
-  ;----------------------Interpolation-------------------------------------------------------------;
-  if keyword_set(interpolation) then begin   ;Matsuda et al., 2014 original interpolation method
-    sz2_int=sz1*2-1
-    sz3_int=(sz1-1)/2
-    array2_Int=dblarr(sz2_int,sz2_int,tt1_int)
-    array3_int=dblarr(sz2_int,sz2_int,tt1_int)
-    array3_int1=dblarr(sz2_int,sz2_int,tt1_int)
-    array4_int=dblarr(sz1_int,sz1_int,tt1_int)
-    sarray1_int=intarr(sz2_int,sz2_int,tt1_int)
+    mask1a=fltarr(xy1,xy1)
+    mask1b=fltarr(xy1,xy1)
+    rr2=dblarr(xy1,xy1)
+    for lc1=0,xy1-1 do begin
+      for lc2=0,xy1-1 do begin
+        rr2(lc1,lc2)=sqrt((float(lc1)-float(xy1-1.0)/2.0)^2+(float(lc2)-float(xy1-1.0)/2.0)^2)
+      endfor
+    endfor
 
-    array2_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)=array1_int(*,*,*)
-    sarray1_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)=interpol_table(*,*,*)
 
-    for in4=0,tt1_int-1 do begin
-      for in1=(sz2_int-1)/2-sz3_int,(sz2_int-1)/2+sz3_int do begin
-        for in2=(sz2_int-1)/2-sz3_int,(sz2_int-1)/2+sz3_int do begin
-          in3=sarray1_int(in1,in2,in4)
-          if  (in3 ne 999) then begin
-            if (in3 gt 0) then begin
-              array3_int(in1,in2,in4)=max(array2_int(in1-in3:in1+in3,in2-in3:in2+in3,in4))
-            endif else begin
-              array3_int(in1,in2,in4)=array2_int(in1,in2,in4)
-            endelse
+    cir2=where((rr2 lt float(zpx*dx)/LH_max) or (rr2 gt float(zpx*dx)/LH_min))
+    for lc3=0,tt1-1 do begin
+      mask1a(*,*)=xgo1(*,*,lc3)
+      mask1b(*,*)=ygo1(*,*,lc3)
+      mask1a(cir2)=999
+      mask1b(cir2)=999
+      xgo1(*,*,lc3)=mask1a(*,*)
+      ygo1(*,*,lc3)=mask1b(*,*)
+    endfor
 
+    v2=dblarr(xy2,xy2,tt1)
+    v3=dblarr(xy2,xy2,tt1)
+    v4=dblarr(xy2,xy2,tt1)
+
+    ;------------------------Conversion to phase speed domain----------------------------------------------------------------------------------;
+
+    for ca4=0,tt1-1 do begin
+      for ca1=0,xy1-1 do begin
+        for ca2=0,xy1-1 do begin
+          if (v1a(ca1,ca2,ca4) gt Vp_min) and (v1a(ca1,ca2,ca4) le Vp_max) and ((v1a(ca1,ca2,ca4) ne 0)) and (xgo1(ca1,ca2,ca4) ne 999) then begin
+            v2(xgo1(ca1,ca2,ca4),ygo1(ca1,ca2,ca4),ca4) +=fft_result2(ca1,ca2,ca4)*jacobian1(ca1,ca2,ca4)
+            v3(xgo1(ca1,ca2,ca4),ygo1(ca1,ca2,ca4),ca4) +=1.0
           endif
         endfor
       endfor
     endfor
-    array4_int(*,*,*)=array3_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)
-    interpol_result=array4_int ;Phase speed array after interpolation (vx,vy,w)
-  endif  else begin
 
-    for in4=0,tt1_int-1 do begin  ;Triange interpolation method
-      C0 = interpol_table(*, *,in4)
-      ND1 = WHERE(C0 ne 999)
-      C1 = 0
-      C2 = 0
-      C3 = FLTARR(xy2, xy2)
+    print, 'conversion to phase speed done'
+    ;------------Make interpolation table-----------------------------------------------------------------------------;
 
-      IF ND1(0) ne - 1 THEN BEGIN
-        c1 = array1_int(*, *,in4)
-        yyyy = INTARR(xy2,xy2)
-        FOR i = 0, xy2 - 1 DO BEGIN
-          yyyy(i , *) = INDGEN(xy2)
-        ENDFOR
-        xxxx = transpose(yyyy)
-        ND0 = WHERE(c1(ND1) ne 0)
-        TRIANGULATE,  xxxx(ND1(ND0)) , yyyy(ND1(ND0)),tri
-        c2 = trigrid( xxxx(ND1(ND0)), yyyy(ND1(ND0)), c1(ND1(ND0)),  $
-          tri,NY = MAX(xxxx(ND1(ND0))) - MIN(xxxx(ND1(ND0))) + 1,NX =  MAX(yyyy(ND1(ND0))) - MIN(yyyy(ND1(ND0))) + 1)
-        ND2 = WHERE(C0  eq 999 )
-        c3(MIN(xxxx(ND1(ND0))):MAX(xxxx(ND1(ND0))), MIN(yyyy(ND1(ND0))):MAX(yyyy(ND1(ND0)))) = c2
-        c3(ND2) = 0.
+    sz1=xy2
+    sz2=sz1*2-1
+    sz3=(sz1-1)/2
+    phsp_range=fltarr(2,tt1)  ;Phase speed range
+    interpolate_table=intarr(sz1,sz1,tt1)
+    interpol_result=fltarr(sz1,sz1,tt1)
 
-      ENDIF
-      interpol_result(*, *,in4) = c3 ;;Phase speed array after interpolation (vx,vy,w)
+    for ts1=0,tt1-1 do begin
+      phsp_range(0,ts1)=round((LH_min/(zpt*tres))*((zpt/2-tr1(0)-ts1)))
+      phsp_range(1,ts1)=round((LH_max/(zpt*tres))*(zpt/2-tr1(0)-ts1))
+      array2=dblarr(sz2,sz2)
+      sarray1=intarr(sz2,sz2)
+      ax3=fltarr(sz2)
+      if (sz2 mod 2) eq 1 then begin
+        ax3(0:sz2/2-1)=-reverse(findgen((sz2-1)/2)+1)
+        ax3(sz2/2+1:sz2-1)=-reverse(ax3(0:sz2/2-1))
+      endif else begin
+        ax3(0:sz2/2)=-reverse(findgen(sz2/2+1)+1)
+        ax3(sz2/2+2:sz2-1)=findgen(sz2/2-2)+1
+      endelse
+      array2((sz2-1)/2-sz3:(sz2-1)/2+sz3,(sz2-1)/2-sz3:(sz2-1)/2+sz3)=v3(*,*,ts1)
 
+      for is1=(sz2-1)/2-sz3,(sz2-1)/2+sz3 do begin
+        for is2=(sz2-1)/2-sz3,(sz2-1)/2+sz3 do begin
+          spr1=sqrt(ax3(is1)^2+ax3(is2)^2)
+          if (spr1 ge phsp_range(0,ts1)) and (spr1 le phsp_range(1,ts1)) and (spr1 gt Vp_min) and (spr1 le Vp_max) then begin
+            is3=-1
+            repeat begin
+              is3=is3+1
+              sarray1(is1,is2)=is3
+              key1=0 & key2=0
+              key1=keyword_set(where(array2(is1-is3:is1+is3,is2-is3:is2+is3) ne 0.0 ,/null))
+              key2=keyword_set(array2(is1,is2) ne 0.0)
+            endrep until (key1 eq 1) or (key2 eq 1)
+          endif else begin
+            sarray1(is1,is2)=999
+          endelse
+        endfor
+      endfor
+      interpolate_table(*,*,ts1)=sarray1((sz2-1)/2-sz3:(sz2-1)/2+sz3,(sz2-1)/2-sz3:(sz2-1)/2+sz3)
     endfor
-  endelse
+    interpol_table=interpolate_table
 
-  print, 'almost there'
-  ;----------------Calculate the 2D phase velocity-----------------------------------------------------------;
+    ;------Get the convolution result-----------------------------------------------------------------;
 
-  total_result_new=alog10(total(interpol_result(*,*,*)/float(zpt*tres),3)+1.0e-22) ;2D Phase speed array (vx,vy)
-  final_2D_PHS=total_result_new
-  print, 'Minimum PSD= ', min(final_2D_phs)
-  print, 'Maximum PSD= ', max(final_2D_phs)
-  FINAL_DATA=total_result_new
+    v3(where(v3 eq 0.0))=1.0
+    v4(*,*,*)=v2(*,*,*)/v3(*,*,*)
+    convol_result=v4  ;Phase speed array before interpolation
 
-  ;================================================================================
+    array1_int=convol_result
+    fsize_int=size(array1_int) & sz1_int=fsize_int(1) & tt1_int=fsize_int(3)
+    sr1_int=[zpx/2-fix(float(zpx*dx)/float(LH_min)),zpy/2+fix(float(zpy*dy)/float(LH_min))]
 
-  TOC
-  ; for i=0,tt1_int-1 do begin
-  ;
-  ;   Pband=alog10(interpol_result(*,*,i)/float(zpt*tres)+1.0e-22)
-  ;   NAME=FILE+'_'+string(i)+'.csv'
-  ;   FILES=NAME.compress()
-  ;   WRITE_CSV,FILES,Pband
-  ; endfor
-NAME=FILE+'.csv'
-NAME=NAME.compress()
-  WRITE_CSV,NAME,FINAL_DATA
+    print, 'convolution done'
+    ;----------------------Interpolation-------------------------------------------------------------;
+    if keyword_set(interpolation) then begin   ;Matsuda et al., 2014 original interpolation method
+      sz2_int=sz1*2-1
+      sz3_int=(sz1-1)/2
+      array2_Int=dblarr(sz2_int,sz2_int,tt1_int)
+      array3_int=dblarr(sz2_int,sz2_int,tt1_int)
+      array3_int1=dblarr(sz2_int,sz2_int,tt1_int)
+      array4_int=dblarr(sz1_int,sz1_int,tt1_int)
+      sarray1_int=intarr(sz2_int,sz2_int,tt1_int)
 
-endfor
+      array2_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)=array1_int(*,*,*)
+      sarray1_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)=interpol_table(*,*,*)
+
+      for in4=0,tt1_int-1 do begin
+        for in1=(sz2_int-1)/2-sz3_int,(sz2_int-1)/2+sz3_int do begin
+          for in2=(sz2_int-1)/2-sz3_int,(sz2_int-1)/2+sz3_int do begin
+            in3=sarray1_int(in1,in2,in4)
+            if  (in3 ne 999) then begin
+              if (in3 gt 0) then begin
+                array3_int(in1,in2,in4)=max(array2_int(in1-in3:in1+in3,in2-in3:in2+in3,in4))
+              endif else begin
+                array3_int(in1,in2,in4)=array2_int(in1,in2,in4)
+              endelse
+
+            endif
+          endfor
+        endfor
+      endfor
+      array4_int(*,*,*)=array3_int((sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,(sz2_int-1)/2-sz3_int:(sz2_int-1)/2+sz3_int,*)
+      interpol_result=array4_int ;Phase speed array after interpolation (vx,vy,w)
+    endif  else begin
+
+      for in4=0,tt1_int-1 do begin  ;Triange interpolation method
+        C0 = interpol_table(*, *,in4)
+        ND1 = WHERE(C0 ne 999)
+        C1 = 0
+        C2 = 0
+        C3 = FLTARR(xy2, xy2)
+
+        IF ND1(0) ne - 1 THEN BEGIN
+          c1 = array1_int(*, *,in4)
+          yyyy = INTARR(xy2,xy2)
+          FOR i = 0, xy2 - 1 DO BEGIN
+            yyyy(i , *) = INDGEN(xy2)
+          ENDFOR
+          xxxx = transpose(yyyy)
+          ND0 = WHERE(c1(ND1) ne 0)
+          TRIANGULATE,  xxxx(ND1(ND0)) , yyyy(ND1(ND0)),tri
+          c2 = trigrid( xxxx(ND1(ND0)), yyyy(ND1(ND0)), c1(ND1(ND0)),  $
+            tri,NY = MAX(xxxx(ND1(ND0))) - MIN(xxxx(ND1(ND0))) + 1,NX =  MAX(yyyy(ND1(ND0))) - MIN(yyyy(ND1(ND0))) + 1)
+          ND2 = WHERE(C0  eq 999 )
+          c3(MIN(xxxx(ND1(ND0))):MAX(xxxx(ND1(ND0))), MIN(yyyy(ND1(ND0))):MAX(yyyy(ND1(ND0)))) = c2
+          c3(ND2) = 0.
+
+        ENDIF
+        interpol_result(*, *,in4) = c3 ;;Phase speed array after interpolation (vx,vy,w)
+
+      endfor
+    endelse
+
+    print, 'almost there'
+    ;----------------Calculate the 2D phase velocity-----------------------------------------------------------;
+
+    total_result_new=alog10(total(interpol_result(*,*,*)/float(zpt*tres),3)+1.0e-22) ;2D Phase speed array (vx,vy)
+    final_2D_PHS=total_result_new
+    print, 'Minimum PSD= ', min(final_2D_phs)
+    print, 'Maximum PSD= ', max(final_2D_phs)
+    FINAL_DATA=total_result_new
+
+    ;================================================================================
+
+    TOC
+    ;   for i=0,tt1_int-1 do begin
+    ;
+    ;     Pband=alog10(interpol_result(*,*,i)/float(zpt*tres)+1.0e-22)
+    ;     NAME=FILE+'_'+string(i)+'.csv'
+    ;     FILES=NAME.compress()
+    ;     WRITE_CSV,FILES,Pband
+    ;   endfor
+    NAME=FILE+'_TOTAL.csv'
+    NAME=NAME.compress()
+    WRITE_CSV,NAME,FINAL_DATA
+
+  ENDFOR
 end

@@ -24,7 +24,7 @@ perpow=np.zeros((np.size(perbin),8))
 permean=np.zeros(np.size(perbin))
 
 for k in range(0,8):
-    FILE='C:\Users\Kenneth\Desktop\AMTM\AMTM'
+    FILE='C:\Users\Kenneth\Desktop\AMTM-ASI-3hr-18-19\AMTM'
     
     path=FILE+str(k)+'_WN_'
     files=glob.glob(path+'*.csv')
@@ -56,7 +56,7 @@ for k in range(0,8):
     
     plt.loglog(perbin,perpow[:,k],linewidth=0.5)  
     plt.xlim(60,1)
-    plt.title('Period Analysis AMTM-BandOH')
+    plt.title('Period Analysis AMTM-BandOH (Jun18-19)')
     plt.xlabel('Period (min)')
     plt.ylabel('Power (1/min)')
 #    plt.loglog(perbin,(perbin)**(-1)*10**-0.5,label='5/3-power')
@@ -71,7 +71,7 @@ plt.loglog(perbin,permean,label='AMTM-BandOH-mean',linewidth=3)
 
 
 
-path='C:\Users\Kenneth\Desktop\Analysis24hr\AMTM_BandOH_WN_'
+path='C:\Users\Kenneth\Desktop\AMTM-ASI_24hr-18-19\AMTM_BandOH_18-19_WN_'
 files=glob.glob(path+'*.csv')
 files=natsorted(files)
 

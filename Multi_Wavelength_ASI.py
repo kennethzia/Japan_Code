@@ -21,7 +21,7 @@ wavepow=np.zeros((np.size(wavebin),8))
 wavepow2=np.zeros((np.size(wavebin),8))
 wavemean=np.zeros(np.size(wavebin))
 for k in range(0,8):
-    FILE='C:\Users\Kenneth\Desktop\post-data\ASI'+np.str(k)
+    FILE='C:\Users\Kenneth\Desktop\AMTM-ASI-3hr-18-19\ASI'+np.str(k)
     
     path=FILE+'_WN_'
     files=glob.glob(path+'*.csv')
@@ -56,7 +56,7 @@ for k in range(0,8):
  
     plt.loglog(wavebin,wavepow[:,k],linewidth=0.5)  
 
-    plt.title('Wavelength Analysis ASI')
+    plt.title('Wavelength Analysis ASI (Jun18-19)')
     plt.xlabel('Wavelegnth (km)')
     plt.ylabel('Power (1/km)')
 
@@ -66,7 +66,7 @@ for i in range (0,np.size(wavebin)):
 plt.loglog(wavebin,wavemean,label='ASI-mean',linewidth=3)
 
 wavepow24=np.zeros(np.size(wavebin))
-FILE='C:\Users\Kenneth\Desktop\Analysis24hr\ASI'
+FILE='C:\Users\Kenneth\Desktop\post-data\ASI_18-19'
 
 path=FILE+'_WN_'
 files=glob.glob(path+'*.csv')
