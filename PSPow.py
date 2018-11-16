@@ -10,7 +10,7 @@ import pandas as pd
 
 plt.rcParams.update({'font.size': 15})
 
-data = pd.read_csv('C:\Users\Kenneth\Desktop\Analysis24hr\AMTM_BandOH_TOTAL.csv')
+data = pd.read_csv('C:\Users\Kenneth\Desktop\Analysis24hr\ASI_TOTAL.csv')
 data=data.values
 
 data=np.delete(data, 0, 1)
@@ -56,7 +56,7 @@ circle33 = plt.Circle((0, 0), 80,linestyle=':', color='k', fill=False)
 circle43 = plt.Circle((0, 0), 90,linestyle=':', color='k', fill=False)
 
 
-plt.pcolormesh(x,y,data,cmap='jet',vmin=-6.5,vmax=-14)
+plt.pcolormesh(x,y,data,cmap='jet',vmin=-11.5,vmax=-6.5)
 #plt.contour(x,y,Chat2,levels = [0.0],colors=('k'),linestyles=('-'),linewidths=(2)) 
 #x,y=np.meshgrid(x,y)
 #f = interp2d(x, y, data, kind='cubic')
@@ -68,7 +68,7 @@ plt.pcolormesh(x,y,data,cmap='jet',vmin=-6.5,vmax=-14)
 #plt.pcolormesh(Xn, Yn, data21, cmap='jet',vmin=-6.5,vmax=-14)
 
 
-plt.title('MCM_AMTM_BandOH')
+plt.title('MCM_ASI 24hr Analysis')
 
 TP='Total Power'+"{:.2E}".format(Decimal(np.str(t)))
 plt.text(-150,140,TP,color='white',fontsize=12)
@@ -97,4 +97,4 @@ plt.gcf().gca().add_artist(circle13)
 plt.gcf().gca().add_artist(circle23)
 plt.gcf().gca().add_artist(circle33)
 plt.gcf().gca().add_artist(circle43)
-plt.savefig('C:\Users\Kenneth\Desktop\Analysis24hr\AMTM_BandOH_TOTAL.jpg')
+plt.savefig('C:\Users\Kenneth\Desktop\Analysis24hr\ASI_TOTAL.jpg')

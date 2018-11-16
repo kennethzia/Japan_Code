@@ -49,7 +49,7 @@ function FFT_AMTM_BAND, img,dx=dx,dy=dy,dt=dt,$
 
 TIC
 ;FILE='C:/Users/Kenneth/Desktop'
-FILE='/home0/ken/post-data/BandOH_Nomean'
+FILE='/home0/ken/post-data/AMTM_Nomean'
 
 ;----------------------Set Image Resolution----------------------------------------------;
 if not (keyword_set(dx)) then dx=625. ;Image resolution of x axis (m)
@@ -67,15 +67,15 @@ icen=(nt-1)/2
 ;-----------------------Set Wave Parameters Input-----------------------------------------;
 
 if not (keyword_set(LH_min)) then LH_min= 5000.0         ;Horizontal wavelength minimum (m)
-if not (keyword_set(LH_max)) then LH_max= 100000.0       ;Horizontal wavelength maximum (m)
+if not (keyword_set(LH_max)) then LH_max= 1000000.0       ;Horizontal wavelength maximum (m)
 if not (keyword_set(T_min)) then T_min= 480.0            ;Wave period minimum (s)
-if not (keyword_set(T_max)) then T_max= 3600.0           ;Wave period maximum (s)
+if not (keyword_set(T_max)) then T_max= 6.0*3600.0           ;Wave period maximum (s)
 if not (keyword_set(Vp_min)) then Vp_min= 0.0            ;Wave speed minimum (m/s)
 if not (keyword_set(Vp_max)) then Vp_max= 150.           ;Wave speed maximum (m/s)
 
 ;-------------------------Set zero padding parameters------------------------------------;
 
-if not (keyword_set(zpx)) then zpx=512  ;Size of zero padding in x axis
+if not (keyword_set(zpx)) then zpx=1024.  ;Size of zero padding in x axis
 if not (keyword_set(zpy)) then zpy=zpx    ;Size of zero padding in y axis
 if not (keyword_set(zpt)) then zpt=2.0^11   ;Zero padding size in time dimension
 

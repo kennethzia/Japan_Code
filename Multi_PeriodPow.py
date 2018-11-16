@@ -19,7 +19,8 @@ plt.rcParams.update({'font.size': 15})
 
 plt.figure(figsize=(10,8))
 
-perbin=np.zeros(30)
+Q=30
+perbin=np.zeros(Q)
 perpow=np.zeros((np.size(perbin),8))
 permean=np.zeros(np.size(perbin))
 
@@ -46,23 +47,22 @@ for k in range(0,8):
     
         data2 = pd.read_csv(files[i])
         data1[:,:,i]=data2.values
-        x=i/10
+        x=i/10.0
         bins=int(np.rint(x))-1
         perpow[bins,k]=np.log10(600.0*np.sum(10**data1[:,:,i])/((dt*zpt)**2)+10**perpow[bins,k])
-    for j in range (0,30,1):
+    for j in range (0,Q,1):
         perbin[j]=1.0/(1.0/(8*60.0)-(j*10.0)/(dt*zpt))/60.0
         
     
     
     plt.loglog(perbin,perpow[:,k],linewidth=0.5)  
-    plt.xlim(60,1)
     plt.title('Period Analysis AMTM-BandOH (Jun18-19)')
     plt.xlabel('Period (min)')
     plt.ylabel('Power (1/min)')
 #    plt.loglog(perbin,(perbin)**(-1)*10**-0.5,label='5/3-power')
 #    plt.loglog(perbin,(perbin)**(-0.5)*10**-1,label='3/1-power')
 
-for j in range (0,30,1):
+for j in range (0,Q,1):
     permean[j]=np.average(perpow[j,:])
 
 
@@ -85,14 +85,14 @@ data=np.zeros((a,a+1))
 x1=np.zeros(np.size(files))
 y1=np.zeros(np.size(files))
 
-perbin=np.zeros(30)
+perbin=np.zeros(Q)
 perpow=np.zeros(np.size(perbin))
 
 for i in range(0,np.size(files)-1):
 
     data2 = pd.read_csv(files[i])
     data1[:,:,i]=data2.values
-    x=i/10
+    x=i/10.0
     bins=int(np.rint(x))-1
     perpow[bins]=np.log10(600.0*np.sum(10**data1[:,:,i])/((dt*zpt)**2)+10**perpow[bins])
 for j in range (0,30,1):
@@ -112,6 +112,6 @@ plt.loglog(perbin,(perbin)**(2)*10**(-11.0/3.0),linewidth=2,linestyle='--',label
 #plt.fill_between(perbin, perpow, permean, where=permean <= perpow,
 #                 facecolor='red', interpolate=True)
 plt.legend()
-plt.xlim(60,8) 
+plt.xlim(100,8) 
 
 #plt.savefig(FILE+str(k)+'Period.jpg')

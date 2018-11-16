@@ -21,6 +21,8 @@ plt.figure(figsize=(10,8))
 perbin=np.zeros(30)
 perpow=np.zeros((np.size(perbin),8))
 permean=np.zeros(np.size(perbin))
+perpow2=np.zeros(np.size(perbin))
+
 
 for k in range(0,8):
     FILE='C:\Users\Kenneth\Desktop\AMTM-ASI-3hr-18-19\ASI'
@@ -46,9 +48,11 @@ for k in range(0,8):
         data1[:,:,i]=data2.values
         x=i/10
         bins=int(np.rint(x))-1
-        perpow[bins,k]=np.log10(600.0*np.sum(10**data1[:,:,i])/((dt*zpt)**2)+10**perpow[bins,k])
+        perpow2[bins]=np.log10(600.0*np.sum(10**data1[:,:,i])/((dt*zpt)**2)+10**perpow[bins,k])
+    perpow2=perpow2[::-1]
+    perpow[:,k]=perpow2[:]
     for j in range (0,30,1):
-        perbin[j]=1.0/(1.0/(8*60.0)-(j*10.0)/(dt*zpt))/60.0
+        perbin[j]=1.0/(1.0/(3600.0)+(j*10.0)/(dt*zpt))/60.0
         
     
     
@@ -68,7 +72,7 @@ plt.loglog(perbin,permean,label='ASI-mean',linewidth=3)
 
 
 
-path='C:\Users\Kenneth\Desktop\post-data\ASI_18-19_WN_'
+path='C:\Users\Kenneth\Desktop\AMTM-ASI_24hr-18-19\ASI_18-19_WN_'
 files=glob.glob(path+'*.csv')
 files=natsorted(files)
 
@@ -92,8 +96,9 @@ for i in range(0,np.size(files)-1):
     x=i/10
     bins=int(np.rint(x))-1
     perpow[bins]=np.log10(600.0*np.sum(10**data1[:,:,i])/((dt*zpt)**2)+10**perpow[bins])
+perpow=perpow[::-1]
 for j in range (0,30,1):
-    perbin[j]=1.0/(1.0/(8*60.0)-(j*10.0)/(dt*zpt))/60.0
+    perbin[j]=1.0/(1.0/(3600.0)+(j*10.0)/(dt*zpt))/60.0
 
     
 plt.loglog(perbin,perpow,label='ASI-24hr',linewidth=3)

@@ -21,7 +21,7 @@ plt.rcParams.update({'font.size': 15})
 
 
 
-path='C:\Users\Kenneth\Desktop\post-data\AMTM*TOTAL'
+path='C:\Users\Kenneth\Desktop\ASI-3hr\ASI*TOTAL'
 files=glob.glob(path+'.csv')
 files=natsorted(files)
 
@@ -118,7 +118,7 @@ for k in range(0,np.size(files)):
     plt.text(78,140,'Max_Val='+np.str(int(psmax))+'[m/s]',color='white',fontsize=12)
 
     plt.show()
-    plt.savefig('C:/Users/Kenneth/Desktop/post-data/AMTM_3hr_#'+np.str(k)+'.jpeg')
+    plt.savefig('C:/Users/Kenneth/Desktop/ASI-3hr/ASI_3hr_#'+np.str(k)+'.jpeg')
 #    
 
    
@@ -161,10 +161,10 @@ circle23 = plt.Circle((0, 0), 70,linestyle=':', color='k', fill=False)
 circle33 = plt.Circle((0, 0), 80,linestyle=':', color='k', fill=False)
 circle43 = plt.Circle((0, 0), 90,linestyle=':', color='k', fill=False)
 
-plt.pcolormesh(x,y,data3,cmap='jet',vmin=-6.5,vmax=-12)
+plt.pcolormesh(x,y,data3,cmap='jet',vmin=-11.5,vmax=-6.5)
 plt.plot()
 
-plt.title('AMTM BandOH 24hr Avgerage')
+plt.title('ASI 24hr Avgerage')
 
 plt.xlabel('Phase Speed (E-W) [m/s]')
 plt.ylabel('Phase Speed (N-S) [m/s]')
@@ -195,5 +195,5 @@ plt.text(78,130,'Theta='+np.str(int(theta))+'[deg]',color='white',fontsize=12)
 plt.text(78,140,'Max_Val='+np.str(int(psmax))+'[m/s]',color='white',fontsize=12)
 
 plt.show()
-#plt.savefig('C:/Users/Kenneth/Desktop/AMTM/AMTM_BandOH_.jpeg')
+plt.savefig('C:/Users/Kenneth/Desktop/ASI-3hr/ASI_AVG.jpeg')
 

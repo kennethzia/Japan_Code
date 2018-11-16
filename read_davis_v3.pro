@@ -12,17 +12,17 @@
 PRO read_davis_v3, date1, data4, dread
 
 TIC
-dread='E:\DATA\MCM ASI 2017_Processed\Jun18-19\SRCAUN'
-;dread='F:\MCM AMTM 2017\Jun18-19\Processed'
+;dread='E:\DATA\MCM ASI 2017_Processed\Jun17-18\SRCAUN'
+dread='F:\MCM AMTM 2017\Jun18-19\Processed'
 ;dread="C:\Users\Kenneth\Desktop\AMTM_BANDOH Jun17-18"
 
-dread1 = FILE_SEARCH(dread + '\OH_srcaun????.tif') ;dt=10sec
-;dread1 = FILE_SEARCH(dread + '\BandOH_caun****.tif') ;dt=37sec
+;dread1 = FILE_SEARCH(dread + '\OH_srcaun????.tif') ;dt=10sec
+dread1 = FILE_SEARCH(dread + '\BandOH_caun****.tif') ;dt=37sec
 ;dread1 = FILE_SEARCH(dread + '\TempOH_caun****.tif') ;dt=37sec
 ;dread1 = FILE_SEARCH(dread + '\P14_1_ff****.tif') ;dt=37sec
 
 
-IPB=7.   ; 'Images Per Bin'
+IPB=2.   ; 'Images Per Bin'
 
 time = N_ELEMENTS(dread1)
 data1 = FLTARR(256, 256, time)
@@ -93,7 +93,7 @@ print,max(data4)
 ;
 
 ;save,data4, filename='E:\DATA\MCM ASI 2017_Processed\MCM ASI 2017 Bin&IDLready\Jun18-19w2minBIN.sav'
-save, data4, filename='C:\Users\Kenneth\Desktop\ASI_Nomean.sav'
+save, data4, filename='C:\Users\Kenneth\Desktop\AMTM_Nomean.sav'
 ;WRITE_CSV,'C:/Users/Kenneth/Desktop/ASI(Norm)_70.csv',DI(*)
 
 
