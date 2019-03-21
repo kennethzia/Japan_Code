@@ -13,7 +13,7 @@ import pandas as pd
 
 plt.rcParams.update({'font.size': 15})
 
-data = pd.read_csv('C:\Users\Kenneth\Desktop\Analysis24hr\AMTM_BandOH_TOTAL.csv')
+data = pd.read_csv('C:\Users\Kenneth\Desktop\MCM_AMTM_2017\Jun17-18\BandOH1hr\BandOH0_TOTAL.csv')
 data=data.values
 
 data=np.delete(data, 0, 1)
@@ -26,7 +26,7 @@ y0=np.zeros(300)
 piece=np.zeros(12)
 
 plt.figure(figsize=(10,8))
-data[:,:]=np.log(10**6*10**data[:,:])
+#data[:,:]=np.log(10**6*10**data[:,:])
 t=np.sum(10**data[:,:])
 
 for i in range(0,299):
@@ -92,7 +92,7 @@ circle33 = plt.Circle((0, 0), 80,linestyle=':', color='k', fill=False)
 circle43 = plt.Circle((0, 0), 90,linestyle=':', color='k', fill=False)
 
 
-plt.pcolormesh(x,y,data,cmap='jet',vmin=-8,vmax=np.max(data))
+plt.pcolormesh(x,y,data,cmap='jet',vmin=-11.5,vmax=-6.5)
 
 plt.title('MCM_BandOH 24hr Analysis')
 
