@@ -61,8 +61,7 @@ for k in range(0,Hours-1):
         bins=int(np.rint(p))-1
         perpow[bins,k]=np.log10(np.sum(10**data1[:,:,i])/((dt*zpt*(zpx*dx)))+10**perpow[bins,k])
     for j in range (0,Q,1):
-        perbin[j]=1.0/((1.0/(8*60.0))-((j*1.0)/(dt*zpt)))/60.0
-        
+        perbin[j]=1/((1.0/(8*60.0))-((j*1.0)/(dt*zpt)))        
     perpow3=perpow[:,k]
     f=interpolate.interp1d(perbin,perpow3,kind='linear')
     perpow4[:,k]=f(x)/((x)**(1.0*10**-5))

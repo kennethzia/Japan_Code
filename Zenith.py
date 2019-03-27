@@ -21,63 +21,112 @@ plt.rcParams.update({'font.size': 15})
 #Ifiles=natsorted(files)
 
 
-m=('\Jun19-20')#,'\Jun18-19')
+m=('\Jun27-28','\Jun28-29','\Jun29-30','\Jun30-01')
+perpath='F:\June 2017'
 
-patha='C:\Users\Kenneth\Desktop'+m+'\BandOH_caun****'
+patha=perpath+m[0]+'\Processed\BandOH_caun****'
 filesa=glob.glob(patha+'.tif')
 filesa=natsorted(filesa)
 
-#pathb='C:\Users\Kenneth\Desktop'+m[1]+'\BandOH_caun****'
-#filesb=glob.glob(pathb+'.tif')
-#filesb=natsorted(filesb)
+pathb=perpath+m[1]+'\Processed\BandOH_caun****'
+filesb=glob.glob(pathb+'.tif')
+filesb=natsorted(filesb) 
+
+pathe=perpath+m[2]+'\Processed\BandOH_caun****'
+filese=glob.glob(pathe+'.tif')
+filese=natsorted(filese)
+
+pathg=perpath+m[3]+'\Processed\BandOH_caun****'
+filesg=glob.glob(pathg+'.tif')
+filesg=natsorted(filesg)
 
 
-pathc='C:\Users\Kenneth\Desktop'+m+'\TempOH_caun****'
+pathc=perpath+m[0]+'\Processed\TempOH_caun****'
 filesc=glob.glob(pathc+'.tif')
 filesc=natsorted(filesc)
 
-#pathd='C:\Users\Kenneth\Desktop'+m[1]+'\TempOH_caun****'
-#filesd=glob.glob(pathd+'.tif')
-#filesd=natsorted(filesd)
+pathd=perpath+m[1]+'\Processed\TempOH_caun****'
+filesd=glob.glob(pathd+'.tif')
+filesd=natsorted(filesd)
 
-Hours=np.size(filesa)#+np.size(filesb)
+pathf=perpath+m[2]+'\Processed\TempOH_caun****'
+filesf=glob.glob(pathf+'.tif')
+filesf=natsorted(filesf)
+
+pathh=perpath+m[3]+'\Processed\TempOH_caun****'
+filesh=glob.glob(pathh+'.tif')
+filesh=natsorted(filesh)
+
+
+Hours=np.size(filesa)+np.size(filesb)+np.size(filese)+np.size(filesf)
 
 I=np.zeros(Hours)
 T=np.zeros(Hours)
 time=np.zeros(Hours)
 
 
-a=plt.imread(filesa[0])
-a1=a.shape
-data=np.zeros((a1[0],a1[1],Hours))
-b=plt.imread(filesc[0])
-b1=a.shape
-data2=np.zeros((b1[0],b1[1],Hours))#,b1[1],Hours))
+
 
 
 for p in range(0,Hours):
-#    if p > (np.size(filesa)-1):
-#        pp=p-np.size(filesa)
-#        data[:,:,p] = plt.imread(filesb[pp])
-#        data2[:,:,p] = plt.imread(filesd[pp])
-#    else:
-    data[:,:,p] = plt.imread(filesa[p])
-    data2[:,:,p] = plt.imread(filesc[p])
+    if p <= (np.size(filesa)-1):
+        a=plt.imread(filesa[0])
+        a1=a.shape
+        data=np.zeros((a1[0],a1[1]))
+        b=plt.imread(filesc[0])
+        b1=a.shape
+        data2=np.zeros((b1[0],b1[1]))#,b1[1],Hours))
+        data[:,:] = plt.imread(filesa[p])
+        data2[:,:] = plt.imread(filesc[p])
 
     
-    I[p]=np.mean(data[int(a1[0]/2)-2:int(a1[0]/2)+2,int(a1[1]/2)-2:int(a1[1]/2)+2,p])
-    T[p]=np.mean(data2[int(a1[0]/2)-2:int(a1[0]/2)+2,int(a1[1]/2)-2:int(a1[1]/2)+2,p])
+    if p > (np.size(filesa)-1) and p <= (np.size(filesa)+np.size(filesb)-1):
+        a=plt.imread(filesb[0])
+        a1=a.shape
+        data=np.zeros((a1[0],a1[1]))
+        b=plt.imread(filesd[0])
+        b1=a.shape
+        data2=np.zeros((b1[0],b1[1]))#,b1[1],Hours))
+        
+        pp=p-np.size(filesa)
+        data[:,:] = plt.imread(filesb[pp])
+        data2[:,:] = plt.imread(filesd[pp])
+
+
+    if p > (np.size(filesa)+np.size(filesb)-1) and p<= (np.size(filesa)+np.size(filesb)+np.size(filese)-1):
+        a=plt.imread(filese[0])
+        a1=a.shape
+        data=np.zeros((a1[0],a1[1]))
+        b=plt.imread(filesf[0])
+        b1=a.shape
+        data2=np.zeros((b1[0],b1[1]))#,b1[1],Hours))
+        pp=p-(np.size(filesa)+np.size(filesb))
+        data[:,:] = plt.imread(filese[pp])
+        data2[:,:] = plt.imread(filesf[pp])
+        
+    if p > (np.size(filesa)+np.size(filesb)+np.size(filese)-1):
+        a=plt.imread(filesg[0])
+        a1=a.shape
+        data=np.zeros((a1[0],a1[1]))
+        b=plt.imread(filesh[0])
+        b1=a.shape
+        data2=np.zeros((b1[0],b1[1]))#,b1[1],Hours))
+        pp=p-(np.size(filesa)+np.size(filesb)+np.size(filese))
+        data[:,:] = plt.imread(filesg[pp])
+        data2[:,:] = plt.imread(filesh[pp])
+
+    I[p]=np.mean(data[int(a1[0]/2)-2:int(a1[0]/2)+2,int(a1[1]/2)-2:int(a1[1]/2)+2])
+    T[p]=np.mean(data2[int(a1[0]/2)-2:int(a1[0]/2)+2,int(a1[1]/2)-2:int(a1[1]/2)+2])
 
     time[p]=p*37.0/3600.0
     
-Iprime=(I-np.mean(I)/np.mean(I))
 
 plt.figure(figsize=(10,10))
 ax1=plt.gca()
 ax2=ax1.twinx()
 ax1.plot(time,I,label='I-Prime',color='b')
 ax1.set_ylabel('Intensity',color='b')
-ax2.plot(time,T,label='Intensity',color='k')
+ax2.plot(time,T/100.0,label='Intensity',color='k')
 ax2.set_ylabel('Temperature (K)',color='k')
 plt.title('MCM Jun17-19 Temperature and Intesnity Variation')
 plt.show()

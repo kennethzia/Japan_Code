@@ -13,27 +13,32 @@ import glob as glob
 from natsort import natsorted
 from scipy import interpolate
 
-m=('\Jun17-18','\Jun18-19')
+m=('\Jun17-18','\Jun18-19','Jun19-20')
 
-patha='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[0]+'\BandOH2hr\BandOH*TOTAL'
+patha='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[0]+'\FixedBandOH\BandOH*TOTAL'
 #path='C:\Users\Kenneth\Desktop\AMTM-3hr\AMTM*TOTAL'
 filesa=glob.glob(patha+'.csv')
 filesa=natsorted(filesa)
 
-pathb='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[1]+'\BandOH2hr\BandOH*TOTAL'
+pathb='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[1]+'\FixedBandOH\BandOH*TOTAL'
 #path='C:\Users\Kenneth\Desktop\AMTM-3hr\AMTM*TOTAL'
 filesb=glob.glob(pathb+'.csv')
 filesb=natsorted(filesb)
+
+pathc='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[2]+'\FixedBandOH\BandOH*TOTAL'
+#path='C:\Users\Kenneth\Desktop\AMTM-3hr\AMTM*TOTAL'
+filesc=glob.glob(pathc+'.csv')
+filesc=natsorted(filesc)
 
 
 x=np.linspace(1,149.,600)
 
 plt.rcParams.update({'font.size': 20})
-Hours=np.size(filesa)+np.size(filesb)
+Hours=np.size(filesa)+np.size(filesb)+np.size(filesc)
 x5=np.linspace(0,Hours-2,100)
-x5=x5*2
+x5=x5
 x2=np.arange(0,Hours)
-x2=x2*2
+x2=x2
 psbin=np.zeros(150)
 psbin2=np.zeros(150)
 pspow=np.zeros((np.size(psbin),Hours))
@@ -47,13 +52,18 @@ psmean=np.zeros(np.size(psbin))
 
 
 for k in range(0,Hours-2):
-    if k > (np.size(filesa)-1):
+    if k<= (np.size(filesa)-1):
+        n=0
+        FILE='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\FixedBandOH\BandOH'+np.str(k)
+    if k > (np.size(filesa)-1) and k <= (np.size(filesa)+np.size(filesb)-1):
         n=1
         kk=k-np.size(filesa)
-        FILE='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\BandOH2hr\BandOH'+np.str(kk)
-    else:
-        n=0
-        FILE='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\BandOH2hr\BandOH'+np.str(k)
+        FILE='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\FixedBandOH\BandOH'+np.str(kk)
+    if k > (np.size(filesa)+np.size(filesb)-1):
+        n=2
+        kk=k-np.size(filesa)
+        FILE='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\FixedBandOH\BandOH'+np.str(kk)
+       
     
     path=FILE+'_TOTAL.csv'
 
@@ -95,7 +105,7 @@ pspow5=np.log10(pspow5+20**(-22))
 plt.pcolormesh(x5,x,pspow5[:,:],cmap='jet',vmin=-9,vmax=np.max(pspow5))
 
 #plt.title('MCM AMTM BandOH Wavelength Spectrum Jun17-18')
-plt.xticks(np.arange(0,2*Hours-1,3))
+plt.xticks(np.arange(0,Hours-1,3))
 plt.xlabel('Hours of Observation')
 plt.ylabel('Phase Speed [m/s]')
 plt.colorbar(label='log$_{10}$(Power)')

@@ -16,9 +16,12 @@ frame = cv2.imread(os.path.join(image_folder, images[0]))
 height, width, layers = frame.shape
 
 video = cv2.VideoWriter(video_name, 0, 10, (width,height))
+for image in images:
+    ing = cv2.imread(os.path.join(image_folder, images))
+    pimg(image)=cv2.equalizeHist(ing)
 
 for image in images:
-    video.write(cv2.imread(os.path.join(image_folder, image)))
+    video.write(cv2.imread(os.path.join(image_folder, pimg)))
 
 cv2.destroyAllWindows()
 video.release()

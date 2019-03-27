@@ -13,29 +13,42 @@ from natsort import natsorted
 from scipy import interpolate
 
 
-m=('\Jun17-18','\Jun18-19')
+m=('\Jun17-18','\Jun18-19','\Jun19-20')
 
-patha='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[0]+'\BandOH1hr\BandOH*TOTAL'
+patha='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[0]+'\FixedBandOH\BandOH*TOTAL'
 #path='C:\Users\Kenneth\Desktop\AMTM-3hr\AMTM*TOTAL'
 filesa=glob.glob(patha+'.csv')
 filesa=natsorted(filesa)
 
-pathb='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[1]+'\BandOH1hr\BandOH*TOTAL'
+pathb='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[1]+'\FixedBandOH\BandOH*TOTAL'
 #path='C:\Users\Kenneth\Desktop\AMTM-3hr\AMTM*TOTAL'
 filesb=glob.glob(pathb+'.csv')
 filesb=natsorted(filesb)
 
+pathc='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[2]+'\FixedBandOH\BandOH*TOTAL'
+#path='C:\Users\Kenneth\Desktop\AMTM-3hr\AMTM*TOTAL'
+filesc=glob.glob(pathc+'.csv')
+filesc=natsorted(filesc)
+
+a=128
+
+dx=625.0
+dy=dx
+zpx=512.0
+dt=74.0
+zpt=2.0**11
+Q=int(zpt/2.-zpt/int(3600.0/dt)) - int(zpt/2.-zpt/int(480.0/dt))+1
 
 
 x=np.linspace(6.,80.,300)
 
 plt.rcParams.update({'font.size': 20})
-Hours=np.size(filesa)+np.size(filesb)
+Hours=np.size(filesa)+np.size(filesb)+np.size(filesc)
 x5=np.linspace(0,Hours-1,400)
 x6=np.linspace(0,Hours-1,400)
 
-wavebin=np.zeros(104)
-wavebin2=np.zeros(104)
+wavebin=np.zeros(Q)
+wavebin2=np.zeros(Q)
 wavepow=np.zeros((np.size(wavebin),Hours))
 wavepow2=np.zeros((np.size(wavebin),Hours))
 wavepow3=np.zeros(np.size(wavebin))
@@ -45,25 +58,22 @@ wavepow5=np.zeros((np.size(x),np.size(x5)))
 wavemean=np.zeros(np.size(wavebin))
 
 waveTOT=np.zeros((np.size(x),np.size(x5)*2))
-for n in range(0,2):
-    pathq='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\BandOH1hr\BandOH*TOTAL'
+for n in range(0,3):
+    pathq='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\FixedBandOH\BandOH*TOTAL'
     filesq=glob.glob(pathq+'.csv')
     filesq=natsorted(filesq)
     for k in range(0,np.size(filesq)):
-        FILE='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\BandOH1hr\BandOH'+np.str(k)
+        FILE='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\FixedBandOH\BandOH'+np.str(k)
         
         path=FILE+'_WN_'
         files=glob.glob(path+'*.csv')
         files=natsorted(files)
-        if n >0 :
+        if n ==1 :
             k=k+np.size(filesq)
-        a=128
-        
-        dx=625.0
-        dy=dx
-        zpx=512.0
-        dt=74.0
-        zpt=2.0**11
+        if n==2:
+            k=k+np.size(filesa)+np.size(filesb)
+            
+            
         data9=np.zeros((a,a+1,np.size(files)))
     
         

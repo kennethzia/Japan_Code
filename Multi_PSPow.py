@@ -14,25 +14,31 @@ import numpy as np
 import pandas as pd
 import glob as glob
 from natsort import natsorted
-from decimal import Decimal
 
 plt.rcParams.update({'font.size': 15})
 
 
 
-path='C:\Users\Kenneth\Desktop\MCM_AMTM_2017\Jun17-18\changedzpt\BandOH*_TOTAL'
+path='C:\Users\Kenneth\Desktop\MCM_AMTM_2017\Jun17-18\FixedBandOH\BandOH*_TOTAL'
 files=glob.glob(path+'.csv')
 files=natsorted(files)
 
-path2='C:\Users\Kenneth\Desktop\MCM_AMTM_2017\Jun18-19\BandOH1hr\BandOH*_TOTAL'
+path2='C:\Users\Kenneth\Desktop\MCM_AMTM_2017\Jun18-19\FIxedBandOH\BandOH*_TOTAL'
 files2=glob.glob(path2+'.csv')
 files2=natsorted(files2)
 
-t2=np.zeros(np.size(files))
-x2=np.zeros(np.size(files))
-data1=np.zeros((300,301,np.size(files)))
-piece=np.zeros((12,np.size(files)))
-quad=np.zeros((4,np.size(files)))
+path3='C:\Users\Kenneth\Desktop\MCM_AMTM_2017\Jun19-20\FixedBandOH\BandOH*_TOTAL'
+files3=glob.glob(path3+'.csv')
+files3=natsorted(files3)
+
+Hours=np.size(files)+np.size(files2)+np.size(files3)
+
+
+t2=np.zeros(Hours)
+x2=np.zeros(Hours)
+data1=np.zeros((300,301,Hours))
+piece=np.zeros((12,Hours))
+quad=np.zeros((4,Hours))
 
 
 #t2=np.zeros(np.size(files))
@@ -42,8 +48,8 @@ quad=np.zeros((4,np.size(files)))
 data=np.zeros((300,301))
 data3=np.zeros((300,301))
 data=np.zeros((300,301))
-piece=np.zeros((12,np.size(files)))
-quad=np.zeros((4,np.size(files)))
+piece=np.zeros((12,Hours))
+quad=np.zeros((4,Hours))
 
 
 
@@ -51,17 +57,21 @@ for i in range(0,np.size(files)):
 
     data2 = pd.read_csv(files[i])
     data1[:,:,i]=data2.values
-#for i in range(0,np.size(files2)):
-#    j=i+np.size(files)
-#    data2 = pd.read_csv(files2[i])
-#    data1[:,:,j]=data2.values
+for i in range(0,np.size(files2)):
+    j=i+np.size(files)
+    data2 = pd.read_csv(files2[i])
+    data1[:,:,j]=data2.values
+for i in range(0,np.size(files3)):
+    j=i+np.size(files)+np.size(files2)
+    data2 = pd.read_csv(files3[i])
+    data1[:,:,j]=data2.values
 
 x=np.arange(-len(data)/2,len(data)/2+1,1)
 y=np.arange(-len(data)/2,len(data)/2+1,1)
 x0=np.zeros(len(data)+1)
 y0=np.zeros(len(data)+1)    
 
-for k in range(0,np.size(files)): 
+for k in range(0,Hours): 
     for i in range(0,300):
         for ii in range(0,301):
         
@@ -104,7 +114,7 @@ for k in range(0,np.size(files)):
     plt.pcolormesh(x,y,data,cmap='jet',vmin=-11.5,vmax=-6.5)
     plt.plot()
     
-    plt.title('AMTM TempOH Jun17-18 (1hr) Interval #'+np.str(k+1))
+#    plt.title('AMTM TempOH Jun17-18 (1hr) Interval #'+np.str(k+1))
     
 #    plt.xlabel('Phase Speed (W-E) [m/s]')
 #    plt.ylabel('Phase Speed (S-N) [m/s]')
@@ -206,7 +216,7 @@ plt.title(' ')
 plt.xlabel('Time (hrs)')
 plt.ylabel('Total Power')
 plt.semilogy(x2,t2, marker='x')
-plt.savefig('C:\Users\Kenneth\Desktop\FixedPlots\BandOH_#'+np.str(k)+'.jpeg')
+#plt.savefig('C:\Users\Kenneth\Desktop\FixedPlots\TotalPower.jpeg')
 #ax1=plt.gca()
 #ax2=ax1.twinx()
 #ax2.semilogy(time,T/100.0,label='Intensity',color='r',linestyle='--')
@@ -220,25 +230,25 @@ plt.xlabel('Time (hrs)')
 plt.ylabel('Total Power')
 
 leg=['NE','NW','SW','SE']
-for k in range(0,4): 
-    plt.plot(x2,quad[k,:],label=leg[k])
+for m in range(0,4): 
+    plt.plot(x2,quad[m,:],label=leg[m])
 plt.legend()
 plt.show()
-plt.savefig('C:\Users\Kenneth\Desktop\FixedPlots\BandOH_#'+np.str(k)+'.jpeg')
+#plt.savefig('C:\Users\Kenneth\Desktop\FixedPlots\QuadPlot.jpeg')
 
 
-for i in range(0,300):
-    for ii in range(0,301):
-        data3[i,ii]=np.log10(np.average(10**data1[i,ii,:]))
-
-
-t=np.sum(10**data3[:,:])
-ind = np.unravel_index(np.argmax(data3, axis=None), data.shape)
-xmax=float(int(ind[1])-150)
-ymax=float(int(ind[0])-150)
-psmax=np.sqrt(xmax**2+ymax**2)
-theta=np.arctan2(ymax,xmax)*180.0/(np.pi)
-plt.savefig('C:\Users\Kenneth\Desktop\FixedPlots\BandOH_#'+np.str(k)+'.jpeg')
+#for i in range(0,300):
+#    for ii in range(0,301):
+#        data3[i,ii]=np.log10(np.average(10**data1[i,ii,:]))
+#
+#
+#t=np.sum(10**data3[:,:])
+#ind = np.unravel_index(np.argmax(data3, axis=None), data.shape)
+#xmax=float(int(ind[1])-150)
+#ymax=float(int(ind[0])-150)
+#psmax=np.sqrt(xmax**2+ymax**2)
+#theta=np.arctan2(ymax,xmax)*180.0/(np.pi)
+#plt.savefig('C:\Users\Kenneth\Desktop\FixedPlots\BandOH_#'+np.str(k)+'.jpeg')
 
 #
 #
