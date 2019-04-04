@@ -19,19 +19,31 @@ plt.rcParams.update({'font.size': 15})
 
 
 
-path='C:\Users\Kenneth\Desktop\MCM_AMTM_2017\Jun17-18\FixedBandOH\BandOH*_TOTAL'
-files=glob.glob(path+'.csv')
-files=natsorted(files)
+m=(r'\Jun26-27',r'\Jun27-28',r'\Jun28-29',r'\Jun29-30',r'\Jun30-01')
 
-path2='C:\Users\Kenneth\Desktop\MCM_AMTM_2017\Jun18-19\FIxedBandOH\BandOH*_TOTAL'
-files2=glob.glob(path2+'.csv')
-files2=natsorted(files2)
+perpath=r'C:\Users\Kenneth\Desktop\MCM_AMTM_2017'
 
-path3='C:\Users\Kenneth\Desktop\MCM_AMTM_2017\Jun19-20\FixedBandOH\BandOH*_TOTAL'
-files3=glob.glob(path3+'.csv')
-files3=natsorted(files3)
+patha=perpath+m[0]+r'\BandOH1hr\BandOH*_TOTAL'
+filesa=glob.glob(patha+'.csv')
+filesa=natsorted(filesa)
 
-Hours=np.size(files)+np.size(files2)+np.size(files3)
+pathb=perpath+m[1]+r'\BandOH1hr\BandOH*_TOTAL'
+filesb=glob.glob(pathb+'.csv')
+filesb=natsorted(filesb) 
+
+pathc=perpath+m[2]+r'\BandOH1hr\BandOH*_TOTAL'
+filesc=glob.glob(pathc+'.csv')
+filesc=natsorted(filesc)
+
+pathd=perpath+m[3]+r'\BandOH1hr\BandOH*_TOTAL'
+filesd=glob.glob(pathd+'.csv')
+filesd=natsorted(filesd)
+
+pathe=perpath+m[4]+r'\BandOH1hr\BandOH*_TOTAL'
+filese=glob.glob(pathe+'.csv')
+filese=natsorted(filese)
+
+Hours=np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)+np.size(filese)
 
 
 t2=np.zeros(Hours)
@@ -53,18 +65,27 @@ quad=np.zeros((4,Hours))
 
 
 
-for i in range(0,np.size(files)):
+for i in range(0,np.size(filesa)):
 
-    data2 = pd.read_csv(files[i])
+    data2 = pd.read_csv(filesa[i])
     data1[:,:,i]=data2.values
-for i in range(0,np.size(files2)):
-    j=i+np.size(files)
-    data2 = pd.read_csv(files2[i])
+for i in range(0,np.size(filesb)):
+    j=i+np.size(filesa)
+    data2 = pd.read_csv(filesb[i])
     data1[:,:,j]=data2.values
-for i in range(0,np.size(files3)):
-    j=i+np.size(files)+np.size(files2)
-    data2 = pd.read_csv(files3[i])
+for i in range(0,np.size(filesc)):
+    j=i+np.size(filesa)+np.size(filesb)
+    data2 = pd.read_csv(filesc[i])
     data1[:,:,j]=data2.values
+for i in range(0,np.size(filesd)):
+    j=i+np.size(filesa)+np.size(filesb)+np.size(filesc)
+    data2 = pd.read_csv(filesd[i])
+    data1[:,:,j]=data2.values
+for i in range(0,np.size(filese)):
+    j=i+np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)
+    data2 = pd.read_csv(filese[i])
+    data1[:,:,j]=data2.values    
+
 
 x=np.arange(-len(data)/2,len(data)/2+1,1)
 y=np.arange(-len(data)/2,len(data)/2+1,1)
@@ -143,9 +164,9 @@ for k in range(0,Hours):
 #    plt.text(-150,140,TP,color='white',fontsize=12)
 #    plt.text(78,130,'Theta='+np.str(int(theta))+'[deg]',color='white',fontsize=12)
 #    plt.text(78,140,'Max_Val='+np.str(int(psmax))+'[m/s]',color='white',fontsize=12)
-
+#
     plt.show()
-    plt.savefig('C:\Users\Kenneth\Desktop\FixedPlots\BandOH_#'+np.str(k)+'.jpeg')
+    plt.savefig(r'C:\Users\Kenneth\Desktop\5dayData\BandOH_#'+np.str(k)+'.jpeg')
   
   
   
@@ -212,15 +233,14 @@ for k in range(0,Hours):
     
 
 plt.figure(figsize=(10,10))
-plt.title(' ')
+plt.title('1-Hourly Change in Total Power')
 plt.xlabel('Time (hrs)')
 plt.ylabel('Total Power')
 plt.semilogy(x2,t2, marker='x')
-#plt.savefig('C:\Users\Kenneth\Desktop\FixedPlots\TotalPower.jpeg')
-#ax1=plt.gca()
-#ax2=ax1.twinx()
-#ax2.semilogy(time,T/100.0,label='Intensity',color='r',linestyle='--')
-#ax2.set_ylabel('Intensity')
+ax1=plt.gca()
+ax2=ax1.twinx()
+ax2.semilogy(time,T/100.0,label='Intensity',color='r',linestyle='--')
+ax2.set_ylabel('Intensity')
 
 plt.show()
 

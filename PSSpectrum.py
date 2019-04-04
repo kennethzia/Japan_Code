@@ -13,28 +13,38 @@ import glob as glob
 from natsort import natsorted
 from scipy import interpolate
 
-m=('\Jun17-18','\Jun18-19','Jun19-20')
 
-patha='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[0]+'\FixedBandOH\BandOH*TOTAL'
-#path='C:\Users\Kenneth\Desktop\AMTM-3hr\AMTM*TOTAL'
+m=(r'\Jun26-27',r'\Jun27-28',r'\Jun28-29',r'\Jun29-30',r'\Jun30-01')
+
+perpath=r'C:\Users\Kenneth\Desktop\MCM_AMTM_2017'
+
+patha=perpath+m[0]+r'\BandOH1hr\BandOH*_TOTAL'
 filesa=glob.glob(patha+'.csv')
 filesa=natsorted(filesa)
 
-pathb='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[1]+'\FixedBandOH\BandOH*TOTAL'
-#path='C:\Users\Kenneth\Desktop\AMTM-3hr\AMTM*TOTAL'
+pathb=perpath+m[1]+r'\BandOH1hr\BandOH*_TOTAL'
 filesb=glob.glob(pathb+'.csv')
-filesb=natsorted(filesb)
+filesb=natsorted(filesb) 
 
-pathc='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[2]+'\FixedBandOH\BandOH*TOTAL'
-#path='C:\Users\Kenneth\Desktop\AMTM-3hr\AMTM*TOTAL'
+pathc=perpath+m[2]+r'\BandOH1hr\BandOH*_TOTAL'
 filesc=glob.glob(pathc+'.csv')
 filesc=natsorted(filesc)
+
+pathd=perpath+m[3]+r'\BandOH1hr\BandOH*_TOTAL'
+filesd=glob.glob(pathd+'.csv')
+filesd=natsorted(filesd)
+
+pathe=perpath+m[4]+r'\BandOH1hr\BandOH*_TOTAL'
+filese=glob.glob(pathe+'.csv')
+filese=natsorted(filese)
+
+
+Hours=np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)+np.size(filese)
 
 
 x=np.linspace(1,149.,600)
 
 plt.rcParams.update({'font.size': 20})
-Hours=np.size(filesa)+np.size(filesb)+np.size(filesc)
 x5=np.linspace(0,Hours-2,100)
 x5=x5
 x2=np.arange(0,Hours)
@@ -47,35 +57,54 @@ pspow3=np.zeros(np.size(psbin))
 pspow4=np.zeros((np.size(x),Hours))
 pspow5=np.zeros((np.size(x),np.size(x5)))
 
-psmean=np.zeros(np.size(psbin))
 
 
 
-for k in range(0,Hours-2):
-    if k<= (np.size(filesa)-1):
-        n=0
-        FILE='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\FixedBandOH\BandOH'+np.str(k)
-    if k > (np.size(filesa)-1) and k <= (np.size(filesa)+np.size(filesb)-1):
-        n=1
-        kk=k-np.size(filesa)
-        FILE='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\FixedBandOH\BandOH'+np.str(kk)
-    if k > (np.size(filesa)+np.size(filesb)-1):
-        n=2
-        kk=k-np.size(filesa)
-        FILE='C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\FixedBandOH\BandOH'+np.str(kk)
-       
+for k in range(0,Hours-1):
+    p=k
+    if p <= (np.size(filesa)-1):
+        a=pd.read_csv(filesa[0])
+        a1=a.shape
+        data=np.zeros((a1[0],a1[1]))
+        data[:,:] = pd.read_csv(filesa[p])
+
     
-    path=FILE+'_TOTAL.csv'
-
-
+    if p > (np.size(filesa)-1) and p <= (np.size(filesa)+np.size(filesb)-1):
+        a=pd.read_csv(filesb[0])
+        a1=a.shape
+        data=np.zeros((a1[0],a1[1]))
         
+        pp=p-np.size(filesa)
+        data[:,:] = pd.read_csv(filesb[pp])
+
+
+    if p > (np.size(filesa)+np.size(filesb)-1) and p<= (np.size(filesa)+np.size(filesb)+np.size(filese)-1):
+        a=pd.read_csv(filesc[0])
+        a1=a.shape
+        data=np.zeros((a1[0],a1[1]))
+        pp=p-(np.size(filesa)+np.size(filesb))
+        data[:,:] = pd.read_csv(filesc[pp])
+        
+    if p > (np.size(filesa)+np.size(filesb)+np.size(filesc)-1) and p<=(np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)-1):
+        a=pd.read_csv(filesd[0])
+        a1=a.shape
+        data=np.zeros((a1[0],a1[1]))
+        pp=p-(np.size(filesa)+np.size(filesb)+np.size(filesc))
+        data[:,:] = pd.read_csv(filesd[pp])
+        
+    if p > (np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)-1):
+        a=pd.read_csv(filese[0])
+        a1=a.shape
+        data=np.zeros((a1[0],a1[1]))
+        pp=p-(np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd))
+        data[:,:] = pd.read_csv(filese[pp])
+
     a=300
     
 
     data9=np.zeros((a,a+1))
 
-    data2 = pd.read_csv(path)
-    data9[:,:]=data2.values
+
     
     b=a/2    
     for i in range(0,a):
@@ -84,7 +113,7 @@ for k in range(0,Hours-2):
             p=r/1.0
             if r<149.0:
                 bins=int(np.ceil(p))
-                pspow[bins,k]=np.log10(np.sum(10**data9[i,ii])+10**pspow[bins,k])
+                pspow[bins,k]=np.log10(np.sum(10**data[i,ii])+10**pspow[bins,k])
     psbin[:]=np.arange(0,150,1)
     pspow3=pspow[:,k]
     f=interpolate.interp1d(psbin,pspow3,kind='linear')
@@ -105,9 +134,10 @@ pspow5=np.log10(pspow5+20**(-22))
 plt.pcolormesh(x5,x,pspow5[:,:],cmap='jet',vmin=-9,vmax=np.max(pspow5))
 
 #plt.title('MCM AMTM BandOH Wavelength Spectrum Jun17-18')
-plt.xticks(np.arange(0,Hours-1,3))
+plt.xticks(np.arange(0,Hours-1,8))
 plt.xlabel('Hours of Observation')
 plt.ylabel('Phase Speed [m/s]')
 plt.colorbar(label='log$_{10}$(Power)')
+plt.ylim(2,150)
 
 

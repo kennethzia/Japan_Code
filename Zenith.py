@@ -21,8 +21,8 @@ plt.rcParams.update({'font.size': 15})
 #Ifiles=natsorted(files)
 
 
-m=('\Jun27-28','\Jun28-29','\Jun29-30','\Jun30-01')
-perpath='F:\June 2017'
+m=('\Jun26-27','\Jun27-28','\Jun28-29','\Jun29-30','\Jun30-01')
+perpath='F:\MCM AMTM 2017'
 
 patha=perpath+m[0]+'\Processed\BandOH_caun****'
 filesa=glob.glob(patha+'.tif')
@@ -39,6 +39,10 @@ filese=natsorted(filese)
 pathg=perpath+m[3]+'\Processed\BandOH_caun****'
 filesg=glob.glob(pathg+'.tif')
 filesg=natsorted(filesg)
+
+pathi=perpath+m[4]+'\Processed\BandOH_caun****'
+filesi=glob.glob(pathi+'.tif')
+filesi=natsorted(filesi)
 
 
 pathc=perpath+m[0]+'\Processed\TempOH_caun****'
@@ -57,8 +61,11 @@ pathh=perpath+m[3]+'\Processed\TempOH_caun****'
 filesh=glob.glob(pathh+'.tif')
 filesh=natsorted(filesh)
 
+pathj=perpath+m[4]+'\Processed\TempOH_caun****'
+filesj=glob.glob(pathj+'.tif')
+filesj=natsorted(filesj)
 
-Hours=np.size(filesa)+np.size(filesb)+np.size(filese)+np.size(filesf)
+Hours=np.size(filesa)+np.size(filesb)+np.size(filese)+np.size(filesg)+np.size(filesi)
 
 I=np.zeros(Hours)
 T=np.zeros(Hours)
@@ -104,7 +111,7 @@ for p in range(0,Hours):
         data[:,:] = plt.imread(filese[pp])
         data2[:,:] = plt.imread(filesf[pp])
         
-    if p > (np.size(filesa)+np.size(filesb)+np.size(filese)-1):
+    if p > (np.size(filesa)+np.size(filesb)+np.size(filese)-1) and p<=(np.size(filesa)+np.size(filesb)+np.size(filese)+np.size(filesg)-1):
         a=plt.imread(filesg[0])
         a1=a.shape
         data=np.zeros((a1[0],a1[1]))
@@ -114,6 +121,18 @@ for p in range(0,Hours):
         pp=p-(np.size(filesa)+np.size(filesb)+np.size(filese))
         data[:,:] = plt.imread(filesg[pp])
         data2[:,:] = plt.imread(filesh[pp])
+        
+    if p > (np.size(filesa)+np.size(filesb)+np.size(filese)+np.size(filesg)-1):
+        a=plt.imread(filesi[0])
+        a1=a.shape
+        data=np.zeros((a1[0],a1[1]))
+        b=plt.imread(filesj[0])
+        b1=a.shape
+        data2=np.zeros((b1[0],b1[1]))#,b1[1],Hours))
+        pp=p-(np.size(filesa)+np.size(filesb)+np.size(filese)+np.size(filesg))
+        data[:,:] = plt.imread(filesi[pp])
+        data2[:,:] = plt.imread(filesj[pp])
+
 
     I[p]=np.mean(data[int(a1[0]/2)-2:int(a1[0]/2)+2,int(a1[1]/2)-2:int(a1[1]/2)+2])
     T[p]=np.mean(data2[int(a1[0]/2)-2:int(a1[0]/2)+2,int(a1[1]/2)-2:int(a1[1]/2)+2])
@@ -128,7 +147,7 @@ ax1.plot(time,I,label='I-Prime',color='b')
 ax1.set_ylabel('Intensity',color='b')
 ax2.plot(time,T/100.0,label='Intensity',color='k')
 ax2.set_ylabel('Temperature (K)',color='k')
-plt.title('MCM Jun17-19 Temperature and Intesnity Variation')
+plt.title('MCM Jun26-30 Temperature and Intesnity Variation')
 plt.show()
 
 #N=np.size(files)*10
