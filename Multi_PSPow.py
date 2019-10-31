@@ -18,33 +18,40 @@ from natsort import natsorted
 plt.rcParams.update({'font.size': 15})
 
 
+#m=(r'\Jun26-27\TempOH2hrsmooth330',r'\Jun27-28\TempOH2hrsmooth330',r'\Jun28-29\TempOH2hrsmooth330',r'\Jun29-30\TempOH2hrsmooth330',r'\Jun30-01\TempOH2hrsmooth330')
 
-m=(r'\Jun26-27',r'\Jun27-28',r'\Jun28-29',r'\Jun29-30',r'\Jun30-01')
+m=(r'\Jun26-27\TempOH2hrsmooth',r'\Jun27-28\TempOH2hrsmooth',r'\Jun28-29\TempOH2hrsmooth',r'\Jun29-30\TempOH2hrsmooth',r'\Jun30-01\TempOH2hrsmooth')
+#m=(r'\SSTempOH2hr',r'\Jun27-28\TempOH2hrsmooth330',r'\Jun28-29\TempOH2hrsmooth330',r'\Jun29-30\TempOH2hrsmooth330',r'\Jun30-01\TempOH2hrsmooth330')
 
-perpath=r'C:\Users\Kenneth\Desktop\MCM_AMTM_2017'
+#date=r'\Dec23-24'
+#phase=r''
 
-patha=perpath+m[0]+r'\BandOH1hr\BandOH*_TOTAL'
+
+perpath=r'E:\MCM_AMTM_2017 (Results)'
+#perpath = r'E:\PFRR\RESULTS\December'+date+r'\Results'
+
+patha=perpath+m[0]+r'\TempOH*_PS'
 filesa=glob.glob(patha+'.csv')
 filesa=natsorted(filesa)
 
-pathb=perpath+m[1]+r'\BandOH1hr\BandOH*_TOTAL'
+pathb=perpath+m[1]+r'\TempOH*_PS'
 filesb=glob.glob(pathb+'.csv')
 filesb=natsorted(filesb) 
 
-pathc=perpath+m[2]+r'\BandOH1hr\BandOH*_TOTAL'
+pathc=perpath+m[2]+r'\TempOH*_PS'
 filesc=glob.glob(pathc+'.csv')
 filesc=natsorted(filesc)
 
-pathd=perpath+m[3]+r'\BandOH1hr\BandOH*_TOTAL'
+pathd=perpath+m[3]+r'\TempOH*_PS'
 filesd=glob.glob(pathd+'.csv')
 filesd=natsorted(filesd)
 
-pathe=perpath+m[4]+r'\BandOH1hr\BandOH*_TOTAL'
+pathe=perpath+m[4]+r'\TempOH*_PS'
 filese=glob.glob(pathe+'.csv')
 filese=natsorted(filese)
 
 Hours=np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)+np.size(filese)
-
+#Hours=np.size(filesa)
 
 t2=np.zeros(Hours)
 x2=np.zeros(Hours)
@@ -58,115 +65,130 @@ quad=np.zeros((4,Hours))
 #data1=np.zeros((300,301,np.size(files)))
 
 data=np.zeros((300,301))
+Avgdata=np.zeros((300,301))
 data3=np.zeros((300,301))
 data=np.zeros((300,301))
 piece=np.zeros((12,Hours))
 quad=np.zeros((4,Hours))
+tie = np.zeros(Hours)
 
 
 
 for i in range(0,np.size(filesa)):
 
     data2 = pd.read_csv(filesa[i])
-    data1[:,:,i]=data2.values
+    data1[:,:,i]=(data2.values)
+    tie[i]=i/2+1
 for i in range(0,np.size(filesb)):
     j=i+np.size(filesa)
     data2 = pd.read_csv(filesb[i])
     data1[:,:,j]=data2.values
+    tie[j] = j/2 +2
 for i in range(0,np.size(filesc)):
     j=i+np.size(filesa)+np.size(filesb)
     data2 = pd.read_csv(filesc[i])
     data1[:,:,j]=data2.values
+    tie[j] = j/2 +4
 for i in range(0,np.size(filesd)):
     j=i+np.size(filesa)+np.size(filesb)+np.size(filesc)
     data2 = pd.read_csv(filesd[i])
     data1[:,:,j]=data2.values
+    tie[j] = j/2 +6
 for i in range(0,np.size(filese)):
     j=i+np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)
     data2 = pd.read_csv(filese[i])
-    data1[:,:,j]=data2.values    
+    data1[:,:,j]=data2.values 
+    tie[j] = j/2 +8
 
 
-x=np.arange(-len(data)/2,len(data)/2+1,1)
-y=np.arange(-len(data)/2,len(data)/2+1,1)
-x0=np.zeros(len(data)+1)
-y0=np.zeros(len(data)+1)    
+x=np.arange(-len(data)/2,len(data)/2,1)
+y=np.arange(-len(data)/2,len(data)/2,1)
+x0=np.zeros(len(data))
+y0=np.zeros(len(data))    
 
 for k in range(0,Hours): 
     for i in range(0,300):
         for ii in range(0,301):
         
-            data[i,ii]= data1[i,ii,k]
-    
-    plt.figure(figsize=(8,8))
-    t=np.sum(10**data[:,:])
+            data[i,ii]= (np.log10(data1[i,ii,k]+10**-22))
+
+#    plt.figure(figsize=(8,8))
+    t=np.sum(10**data[:,:])*150
     t2[k]=t
-    x2[k]=k
+    x2[k]=k*2
     ind = np.unravel_index(np.argmax(data, axis=None), data.shape)
     xmax=float(int(ind[1])-150)
     ymax=float(int(ind[0])-150)
     psmax=np.sqrt(xmax**2+ymax**2)
     theta=np.arctan2(ymax,xmax)*180.0/(np.pi)
-    
-    circle1 = plt.Circle((0, 0), 50, color='k', fill=False)
-    circle2 = plt.Circle((0, 0), 100, color='k', fill=False)
-    circle3 = plt.Circle((0, 0), 150, color='k', fill=False)
-    
-    circle1 = plt.Circle((0, 0), 50, color='k', fill=False)
-    circle2 = plt.Circle((0, 0), 100, color='k', fill=False)
-    circle3 = plt.Circle((0, 0), 150, color='k', fill=False)
-    
-    circle11 = plt.Circle((0, 0), 10,linestyle=':', color='k', fill=False)
-    circle21 = plt.Circle((0, 0), 20,linestyle=':', color='k', fill=False)
-    circle31 = plt.Circle((0, 0), 30,linestyle=':', color='k', fill=False)
-    circle41 = plt.Circle((0, 0), 40,linestyle=':', color='k', fill=False)
-    
-    circle12 = plt.Circle((0, 0), 110,linestyle=':', color='k', fill=False)
-    circle22 = plt.Circle((0, 0), 120,linestyle=':', color='k', fill=False)
-    circle32 = plt.Circle((0, 0), 130,linestyle=':', color='k', fill=False)
-    circle42 = plt.Circle((0, 0), 140,linestyle=':', color='k', fill=False)
-    
-    circle13 = plt.Circle((0, 0), 60,linestyle=':', color='k', fill=False)
-    circle23 = plt.Circle((0, 0), 70,linestyle=':', color='k', fill=False)
-    circle33 = plt.Circle((0, 0), 80,linestyle=':', color='k', fill=False)
-    circle43 = plt.Circle((0, 0), 90,linestyle=':', color='k', fill=False)
-    
-    
-    plt.pcolormesh(x,y,data,cmap='jet',vmin=-11.5,vmax=-6.5)
-    plt.plot()
-    
-#    plt.title('AMTM TempOH Jun17-18 (1hr) Interval #'+np.str(k+1))
-    
-#    plt.xlabel('Phase Speed (W-E) [m/s]')
-#    plt.ylabel('Phase Speed (S-N) [m/s]')
-#    plt.colorbar(label='log$_{10}$(PSD) [m$^{2}$/s$^{2}$]')
-    
-#    plt.plot((0.0,xmax),(0.0,ymax))
-
-    plt.plot(x0,y,color='k',lw='0.5')
-    plt.plot(x,y0,color='k',lw='0.5')
-    plt.gcf().gca().add_artist(circle1)
-    plt.gcf().gca().add_artist(circle2)
-    plt.gcf().gca().add_artist(circle3)
-    plt.gcf().gca().add_artist(circle11)
-    plt.gcf().gca().add_artist(circle21)
-    plt.gcf().gca().add_artist(circle31)
-    plt.gcf().gca().add_artist(circle41)
-    plt.gcf().gca().add_artist(circle12)
-    plt.gcf().gca().add_artist(circle22)
-    plt.gcf().gca().add_artist(circle32)
-    plt.gcf().gca().add_artist(circle42)
-    plt.gcf().gca().add_artist(circle13)
-    plt.gcf().gca().add_artist(circle23)
-    plt.gcf().gca().add_artist(circle33)
-    plt.gcf().gca().add_artist(circle43)
-#    TP='Total Power'+"{:.2E}".format(Decimal(np.str(t)))
-#    plt.text(-150,140,TP,color='white',fontsize=12)
-#    plt.text(78,130,'Theta='+np.str(int(theta))+'[deg]',color='white',fontsize=12)
-#    plt.text(78,140,'Max_Val='+np.str(int(psmax))+'[m/s]',color='white',fontsize=12)
+#    
+#    circle1 = plt.Circle((0, 0), 50, color='k', fill=False)
+#    circle2 = plt.Circle((0, 0), 100, color='k', fill=False)
+#    circle3 = plt.Circle((0, 0), 150, color='k', fill=False)
+#    
+#    circle1 = plt.Circle((0, 0), 50, color='k', fill=False)
+#    circle2 = plt.Circle((0, 0), 100, color='k', fill=False)
+#    circle3 = plt.Circle((0, 0), 150, color='k', fill=False)
+#    
+#    circle11 = plt.Circle((0, 0), 10,linestyle=':', color='k', fill=False)
+#    circle21 = plt.Circle((0, 0), 20,linestyle=':', color='k', fill=False)
+#    circle31 = plt.Circle((0, 0), 30,linestyle=':', color='k', fill=False)
+#    circle41 = plt.Circle((0, 0), 40,linestyle=':', color='k', fill=False)
+#    
+#    circle12 = plt.Circle((0, 0), 110,linestyle=':', color='k', fill=False)
+#    circle22 = plt.Circle((0, 0), 120,linestyle=':', color='k', fill=False)
+#    circle32 = plt.Circle((0, 0), 130,linestyle=':', color='k', fill=False)
+#    circle42 = plt.Circle((0, 0), 140,linestyle=':', color='k', fill=False)
+#    
+#    circle13 = plt.Circle((0, 0), 60,linestyle=':', color='k', fill=False)
+#    circle23 = plt.Circle((0, 0), 70,linestyle=':', color='k', fill=False)
+#    circle33 = plt.Circle((0, 0), 80,linestyle=':', color='k', fill=False)
+#    circle43 = plt.Circle((0, 0), 90,linestyle=':', color='k', fill=False)
+#    
+#    
+#    #plt.pcolormesh(x,y,data[:,:-1],cmap='jet',vmin=-11.5,vmax=-6.5)
+#    levels = [-22.0,-7.0,-6.0,-5.0,-4.5,-4.0,-3.5,-3.0]
+#    plt.pcolormesh(x,y,(data[:,:-1]),cmap='jet',vmin=-7.0,vmax=-3.0)
 #
-    plt.show()
-    plt.savefig(r'C:\Users\Kenneth\Desktop\5dayData\BandOH_#'+np.str(k)+'.jpeg')
+#    plt.plot()
+#    plt.title('Hour #'+np.str(tie[k]))
+##    
+##    plt.xlabel('Phase Speed (W-E) [m/s]')
+##    plt.ylabel('Phase Speed (S-N) [m/s]')
+##    plt.colorbar(label='log$_{10}$(PSD) [m$^{2}$/s$^{2}$]')
+#    
+##    plt.plot((0.0,xmax),(0.0,ymax))
+#
+#    plt.plot(x0,y,color='k',lw='0.5')
+#    plt.plot(x,y0,color='k',lw='0.5')
+#    plt.gcf().gca().add_artist(circle1)
+#    plt.gcf().gca().add_artist(circle2)
+#    plt.gcf().gca().add_artist(circle3)
+#    plt.gcf().gca().add_artist(circle11)
+#    plt.gcf().gca().add_artist(circle21)
+#    plt.gcf().gca().add_artist(circle31)
+#    plt.gcf().gca().add_artist(circle41)
+#    plt.gcf().gca().add_artist(circle12)
+#    plt.gcf().gca().add_artist(circle22)
+#    plt.gcf().gca().add_artist(circle32)
+#    plt.gcf().gca().add_artist(circle42)
+#    plt.gcf().gca().add_artist(circle13)
+#    plt.gcf().gca().add_artist(circle23)
+#    plt.gcf().gca().add_artist(circle33)
+#    plt.gcf().gca().add_artist(circle43)
+##    TP='Total Power'+"{:.2E}".format(Decimal(np.str(t)))
+##    plt.text(-150,140,TP,color='white',fontsize=12)
+##    plt.text(78,130,'Theta='+np.str(int(theta))+'[deg]',color='white',fontsize=12)
+##    plt.text(78,140,'Max_Val='+np.str(int(psmax))+'[m/s]',color='white',fontsize=12)
+#
+#    plt.xticks(np.arange(-150,150,50))
+#    plt.yticks(np.arange(-150,150,50))
+#    
+#    plt.xlim(-150,150)
+#    plt.ylim(-150,150)
+#    
+#    plt.show()
+    #plt.savefig(r'E:\PFRR\RESULTS\December'+date+phase+'\TempOH_#'+np.str(k+1)+'.jpg')
   
   
   
@@ -231,30 +253,39 @@ for k in range(0,Hours):
 #    plt.savefig('C:\Users\Kenneth\Desktop\FixedPlots\BandOH_#'+np.str(k)+'.jpeg')
 
     
+plt.figure(figsize=(20,3))
+#ax1=plt.gca()
+#ax2=ax1.twinx()
 
-plt.figure(figsize=(10,10))
-plt.title('1-Hourly Change in Total Power')
+plt.ylabel('T Variance $[K^2]$')
+plt.plot(tie,t2, marker='x')
+#
+plt.xticks(np.arange(0,120,8))
+#ax1.plot(tie,10**Pow2,marker='x',color='k')
+#ax1.set_ylabel('Variance (T$^|$)',color='k')
+plt.xlim(0,112)
+plt.ylim(0,50)
 plt.xlabel('Time (hrs)')
-plt.ylabel('Total Power')
-plt.semilogy(x2,t2, marker='x')
-ax1=plt.gca()
-ax2=ax1.twinx()
-ax2.semilogy(time,T/100.0,label='Intensity',color='r',linestyle='--')
-ax2.set_ylabel('Intensity')
+#plt.savefig(r'E:\PFRR\RESULTS\December'+date+phase+'\Variance.jpg')
+#plt.savefig(r'C:\Users\Kenneth\Desktop\2hrSmooth\PSTotal.jpeg')
+
 
 plt.show()
 
-plt.figure(figsize=(10,10))
-plt.title('1-Hourly Change in Direction')
+plt.figure(figsize=(14,4))
+
 plt.xlabel('Time (hrs)')
-plt.ylabel('Total Power')
+plt.ylabel('Directional Power')
 
 leg=['NE','NW','SW','SE']
 for m in range(0,4): 
-    plt.plot(x2,quad[m,:],label=leg[m])
+    plt.plot(tie,(quad[m,:]),label=leg[m])
 plt.legend()
+plt.xlim(0,112)
+
+#plt.savefig(r'E:\PFRR\RESULTS\December'+date+phase+'\QuadPow.jpg')
+
 plt.show()
-#plt.savefig('C:\Users\Kenneth\Desktop\FixedPlots\QuadPlot.jpeg')
 
 
 #for i in range(0,300):

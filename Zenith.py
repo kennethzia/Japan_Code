@@ -22,46 +22,47 @@ plt.rcParams.update({'font.size': 15})
 
 
 m=('\Jun26-27','\Jun27-28','\Jun28-29','\Jun29-30','\Jun30-01')
-perpath='F:\MCM AMTM 2017'
+perpathT='E:\MCMJune2017Raw\AMTMTemperature'
+perpathB='E:\MCMJune2017Raw\AMTMBandIntensity'
 
-patha=perpath+m[0]+'\Processed\BandOH_caun****'
+patha=perpathB+m[0]+'\BandOH_caun****'
 filesa=glob.glob(patha+'.tif')
 filesa=natsorted(filesa)
 
-pathb=perpath+m[1]+'\Processed\BandOH_caun****'
+pathb=perpathB+m[1]+'\BandOH_caun****'
 filesb=glob.glob(pathb+'.tif')
 filesb=natsorted(filesb) 
 
-pathe=perpath+m[2]+'\Processed\BandOH_caun****'
+pathe=perpathB+m[2]+'\BandOH_caun****'
 filese=glob.glob(pathe+'.tif')
 filese=natsorted(filese)
 
-pathg=perpath+m[3]+'\Processed\BandOH_caun****'
+pathg=perpathB+m[3]+'\BandOH_caun****'
 filesg=glob.glob(pathg+'.tif')
 filesg=natsorted(filesg)
 
-pathi=perpath+m[4]+'\Processed\BandOH_caun****'
+pathi=perpathB+m[4]+'\BandOH_caun****'
 filesi=glob.glob(pathi+'.tif')
 filesi=natsorted(filesi)
 
 
-pathc=perpath+m[0]+'\Processed\TempOH_caun****'
+pathc=perpathT+m[0]+'\TempOH_caun****'
 filesc=glob.glob(pathc+'.tif')
 filesc=natsorted(filesc)
 
-pathd=perpath+m[1]+'\Processed\TempOH_caun****'
+pathd=perpathT+m[1]+'\TempOH_caun****'
 filesd=glob.glob(pathd+'.tif')
 filesd=natsorted(filesd)
 
-pathf=perpath+m[2]+'\Processed\TempOH_caun****'
+pathf=perpathT+m[2]+'\TempOH_caun****'
 filesf=glob.glob(pathf+'.tif')
 filesf=natsorted(filesf)
 
-pathh=perpath+m[3]+'\Processed\TempOH_caun****'
+pathh=perpathT+m[3]+'\TempOH_caun****'
 filesh=glob.glob(pathh+'.tif')
 filesh=natsorted(filesh)
 
-pathj=perpath+m[4]+'\Processed\TempOH_caun****'
+pathj=perpathT+m[4]+'\TempOH_caun****'
 filesj=glob.glob(pathj+'.tif')
 filesj=natsorted(filesj)
 
@@ -70,8 +71,10 @@ Hours=np.size(filesa)+np.size(filesb)+np.size(filese)+np.size(filesg)+np.size(fi
 I=np.zeros(Hours)
 T=np.zeros(Hours)
 time=np.zeros(Hours)
-
-
+VAR=np.zeros(Hours)
+b=plt.imread(filesc[0])
+b1=b.shape
+data3 = np.zeros((b1[0],b1[1],Hours))
 
 
 
@@ -136,19 +139,27 @@ for p in range(0,Hours):
 
     I[p]=np.mean(data[int(a1[0]/2)-2:int(a1[0]/2)+2,int(a1[1]/2)-2:int(a1[1]/2)+2])
     T[p]=np.mean(data2[int(a1[0]/2)-2:int(a1[0]/2)+2,int(a1[1]/2)-2:int(a1[1]/2)+2])
-
+    data3[:,:,p]=data2[:,:]/100
     time[p]=p*37.0/3600.0
     
-
+T=T/100.0
+Tprime = T-np.mean(T)
+Iprime = I-np.mean(I)
 plt.figure(figsize=(10,10))
 ax1=plt.gca()
 ax2=ax1.twinx()
-ax1.plot(time,I,label='I-Prime',color='b')
-ax1.set_ylabel('Intensity',color='b')
-ax2.plot(time,T/100.0,label='Intensity',color='k')
-ax2.set_ylabel('Temperature (K)',color='k')
+ax1.plot(time,Iprime,label='I-Prime',color='b')
+ax1.set_ylabel('I-prime',color='b')
+ax2.plot(time,Tprime,label='Intensity',color='k')
+ax2.set_ylabel('T-prime (K)',color='k')
 plt.title('MCM Jun26-30 Temperature and Intesnity Variation')
+plt.xticks(np.arange(0,120,2))
+plt.xlim(0,120-7)
 plt.show()
+
+
+plt.figure(figsize=(10,10))
+plt.plot(time,np.var(data3[20:,:,:-50]))
 
 #N=np.size(files)*10
 #f=np.linspace(0.01,2.0,N)
@@ -164,12 +175,12 @@ plt.show()
 #plt.plot(time,T,label='Temperature')
 #plt.legend()
 
-plt.show()
+#plt.show()
 #
 #FFT=np.fft.rfft(I,N)
 #Freq=np.fft.rfftfreq(N,d=1.0/37.0)
 #plt.figure(figsize=(10,10))
-#plt.plot((1.0/Freq)/3600.0,FFT)
+#plt.plot((1.0/Freq),FFT2)
 #plt.show()
 
 

@@ -15,45 +15,58 @@ from scipy import interpolate
 import itertools as it
 
 
-m=(r'\Jun26-27',r'\Jun27-28',r'\Jun28-29',r'\Jun29-30',r'\Jun30-01')
+#m=(r'\Jun26-27\TempOH2hrsmooth330',r'\Jun27-28\TempOH2hrsmooth330',r'\Jun28-29\TempOH2hrsmooth330',r'\Jun29-30\TempOH2hrsmooth330',r'\Jun30-01\TempOH2hrsmooth330')
+#
+#perpath=r'C:\Users\Kenneth\Desktop\MCM_AMTM_2017'
 
-perpath=r'C:\Users\Kenneth\Desktop\MCM_AMTM_2017'
+m=(r'\SSTempOH2hr',r'\Jun27-28\TempOH2hrsmooth330',r'\Jun28-29\TempOH2hrsmooth330',r'\Jun29-30\TempOH2hrsmooth330',r'\Jun30-01\TempOH2hrsmooth330')
 
-patha=perpath+m[0]+r'\BandOH1hr\BandOH*_TOTAL'
+date=r'\Dec23-24'
+phase=r''
+
+
+#perpath=r'C:\Users\Kenneth\Desktop'
+perpath = r'E:\PFRR\RESULTS\December'+date+r'\Results'
+
+patha=perpath+phase+'\TempOH*_TOTAL'
 filesa=glob.glob(patha+'.csv')
 filesa=natsorted(filesa)
 
-pathb=perpath+m[1]+r'\BandOH1hr\BandOH*_TOTAL'
-filesb=glob.glob(pathb+'.csv')
-filesb=natsorted(filesb) 
+#pathb=perpath+m[1]+r'\TempOH*_PS'
+#filesb=glob.glob(pathb+'.csv')
+#filesb=natsorted(filesb) 
+#
+#pathc=perpath+m[2]+r'\TempOH*_PS'
+#filesc=glob.glob(pathc+'.csv')
+#filesc=natsorted(filesc)
+#
+#pathd=perpath+m[3]+r'\TempOH*_PS'
+#filesd=glob.glob(pathd+'.csv')
+#filesd=natsorted(filesd)
+#
+#pathe=perpath+m[4]+r'\TempOH*_PS'
+#filese=glob.glob(pathe+'.csv')
+#filese=natsorted(filese)
 
-pathc=perpath+m[2]+r'\BandOH1hr\BandOH*_TOTAL'
-filesc=glob.glob(pathc+'.csv')
-filesc=natsorted(filesc)
-
-pathd=perpath+m[3]+r'\BandOH1hr\BandOH*_TOTAL'
-filesd=glob.glob(pathd+'.csv')
-filesd=natsorted(filesd)
-
-pathe=perpath+m[4]+r'\BandOH1hr\BandOH*_TOTAL'
-filese=glob.glob(pathe+'.csv')
-filese=natsorted(filese)
-
-Hours=np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)+np.size(filese)
+#Hours=np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)+np.size(filese)
+Hours=np.size(filesa)
 
 
 dx=625.0
 zpx=512.0
-dt=74.0
+dt=60.0
 zpt=2.0**10
-a=128
-Q=int(zpt/2.-zpt/int(3600.0/dt)) - int(zpt/2.-zpt/int(480.0/dt))+1
+#a=128
+a=64
 
-x=np.linspace(8.,59.,300)
+Q=int(zpt/2.-zpt/int(3600.0/dt)) - int(zpt/2.-zpt/int(5*60.0/dt))+1
+QW=int(zpx/2.-zpx/int(100000.0/dx)) - int(zpx/2.-zpx/int(10000.0/dx))+2
+
+x=np.linspace(5.05,60.,1000)
 
 plt.rcParams.update({'font.size': 20})
-x5=np.linspace(0,Hours-1,400)
-x6=np.linspace(0,Hours-1,400)
+x5=np.linspace(0,Hours-1,1000)
+x6=np.linspace(0,Hours-1,1000)
 
 
 
@@ -64,70 +77,92 @@ perpow2=np.zeros((np.size(perbin),Hours))
 perpow3=np.zeros(np.size(perbin))
 perpow4=np.zeros((np.size(x),Hours))
 perpow5=np.zeros((np.size(x),np.size(x5)))
+Pow2 = np.zeros(Hours)
+tie = np.zeros(Hours)
 
 wavemean=np.zeros(np.size(perbin))
 
 waveTOT=np.zeros((np.size(x),np.size(x5)*2))
-for n in range(0,5):
-    pathq=r'C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\BandOH1hr\BandOH*TOTAL'
-    filesq=glob.glob(pathq+'.csv')
-    filesq=natsorted(filesq)
-    for k in range(0,np.size(filesq)):
-        FILE=r'C:\Users\Kenneth\Desktop\MCM_AMTM_2017'+m[n]+'\BandOH1hr\BandOH'+np.str(k)
-        
-        path=FILE+'_WN_'
-        files=glob.glob(path+'*.csv')
-        files=natsorted(files)
-        if n ==1 :
-            k=k+np.size(filesa)
-        if n==2:
-            k=k+np.size(filesa)+np.size(filesb)
-        if n==3:
-            k=k+np.size(filesa)+np.size(filesb)+np.size(filesc)
-        if n==4:
-            k=k+np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)
-        
-        print(k,n)
-        
-        data9=np.zeros((a,a+1,np.size(files)))
-        data10=np.zeros((a,a+1,np.size(files)))
-
-        
-        for i in range(0,np.size(files)-1):
-        
-            data2 = pd.read_csv(files[i])
-            data9[:,:,i]=data2.values
-            
-            b=a/2    
-            for j in it.chain(range(0,60),range(69,a)):
-                for ii in it.chain(range(0,60),range(69,a+1)):
-#                    r=np.sqrt((j-b)**2+(ii-b)**2)
-#                    t=1.0/((r*1.0)/(dx*zpx))/1000.0
-#                    if t>=80.0:
-#                        print j,ii
-#                    if 1.0/((r*1.0)/(dx*zpx))/1000.0 <=80:
-                    data10[j,ii,i]=data9[j,ii,i]
-            perpow[i,k]=np.log10(np.sum(10**data10[:,:,i])*float(np.size(files))/(zpt*dt*(zpx*dx))+10**perpow[i,k])
-        for j in range (0,150):
-            perbin[j]=1/((1.0/(8*60.0))-((j*1.0)/(dt*zpt)))/60.0
-        perpow3=perpow[:,k]
-        f=interpolate.interp1d(perbin,perpow3,kind='linear')
-        perpow4[:,k]=f(x)/((x)**(1.0*10**-5))
+#for n in range(0,5):
+n=0
+pathq=perpath+phase+'\TempOH*_PS'
+filesq=glob.glob(pathq+'.csv')
+filesq=natsorted(filesq)
+for k in range(0,np.size(filesq)):
+    FILE=perpath+phase+'\TempOH'+np.str(k)
+ 
+    path=FILE+'_WN_'
+    files=glob.glob(path+'*.csv')
+    files=natsorted(files)
+#    if n==0:
+    z=k
+    tie[z]=k/2+1
+#    if n ==1 :
+#        k=k+np.size(filesa)
+#        z=k
+#        tie[z] = k/2 +2
+#    if n==2:
+#        k=k+np.size(filesa)+np.size(filesb)
+#        z=k
+#        tie[z] = k/2 +4
+#    if n==3:
+#        k=k+np.size(filesa)+np.size(filesb)+np.size(filesc)
+#        z=k
+#        tie[z] = k/2 +6
+#    if n==4:
+#        k=k+np.size(filesa)+np.size(filesb)+np.size(filesc)+np.size(filesd)
+#        z=k
+#        tie[z] = k/2 +8
     
-plt.figure(figsize=(10,10))
+    print(k,n)
+    
+    data9=np.zeros((a,a+1,np.size(files)))
+    data10=np.zeros((a,a+1,np.size(files)))
+
+    
+    for i in range(0,np.size(files)-1):
+    
+        data2 = pd.read_csv(files[i])
+        data9[:,:,i]=data2.values
+        
+        
+        
+        b=a/2    
+        for j in range(0,a):
+            for ii in range(0,a+1):
+                r=np.sqrt((i-b)**2+(ii-b)**2)
+                p=r/1.0
+                bins=int(np.ceil(p))
+                if r>=3.0 or r<=b:
+                    data10[j,ii,i]=data9[j,ii,i]
+        perpow[i,k]=(np.sum(10**data10[:,:,i])/((zpx*dx)**2)+perpow[i,k])
+    for j in range (0,np.size(files)-1):
+        perbin[j]=(dt/(0.5-(308+j)/2**10))/60.0
+    perpow3=perpow[:,k]
+    f=interpolate.interp1d(perbin,perpow3,kind='linear')
+    perpow4[:,k]=f(x)
+    
+    siz = data9.shape
+    Pow2[k] = np.log10(np.sum(10**data9)*float(siz[2]*siz[0]*siz[1])/(zpt*dt*(zpx*dx)**2))
+
 x2=np.arange(0,Hours)
-for z in range(0,299):
+for z in range(0,np.size(x)):
     f=interpolate.interp1d(x2,perpow4[z,:],kind='linear')
     perpow5[z,:]=f(x5)
-perpow5=np.log10(perpow5)
-perpow5=perpow5[0:-1,:]
+perpow4 = np.log10(perpow4)
 
 
-
-plt.pcolormesh(x5,x,perpow5[:,:],cmap='jet',vmin=np.min(perpow5),vmax=np.max(perpow5))
-#ax2.plot(time,T,label='Intensity',color='r',linestyle='--')
-#plt.title('MCM AMTM BandOH Wavelength Spectrum Jun17-18')
-plt.xticks(np.arange(0,Hours-1,8))
+plt.figure(figsize=(10,10))
+plt.pcolormesh(x5/2+1,x,np.log10(perpow5[:,:]),cmap='jet',vmin=np.min(np.log10(perpow5[:,:])),vmax=np.max(np.log10(perpow5[:,:])))
 plt.xlabel('Hours of Observation')
 plt.ylabel('Period [min]')
 plt.colorbar(label='log$_{10}$(Power)')
+
+plt.savefig(r'E:\PFRR\RESULTS\December'+date+phase+'\FrequencyPow.jpg')
+
+
+
+#plt.figure(figsize=(10,10))
+#plt.plot(tie,10**Pow2,marker='x')
+
+
